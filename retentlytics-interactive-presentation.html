@@ -1,0 +1,3336 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retentlytics AI - Интерактивная Презентация</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 280px;
+            height: 100vh;
+            background: linear-gradient(180deg, #1a1a2e 0%, #0f0f23 100%);
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 2rem 1.5rem;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar h1 {
+            font-size: 1.8rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .nav-section {
+            margin-bottom: 2rem;
+        }
+
+        .nav-section h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 1rem;
+            letter-spacing: 0.05em;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 0.8rem 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(102, 126, 234, 0.1);
+            border-color: rgba(102, 126, 234, 0.3);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Section Headers */
+        .section-header {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-header p {
+            font-size: 1.1rem;
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        /* Cards */
+        .card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.02) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(102, 126, 234, 0.3);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        /* Graphs */
+        .graph-container {
+            width: 100%;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .graph-controls {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            z-index: 10;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .graph-controls button {
+            padding: 0.5rem 1rem;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            border-radius: 6px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .graph-controls button:hover {
+            background: rgba(102, 126, 234, 0.4);
+        }
+
+        /* Grid Layouts */
+        .grid {
+            display: grid;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(102, 126, 234, 0.1);
+            font-weight: 600;
+            color: #fff;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Feature Cards */
+        .feature-card {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+            border: 1px solid rgba(102, 126, 234, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
+        .feature-card h4 {
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Chart Container */
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin-bottom: 2rem;
+        }
+
+        /* Mobile Toggle */
+        .mobile-toggle {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            padding: 0.5rem;
+            background: rgba(102, 126, 234, 0.2);
+            border: 1px solid rgba(102, 126, 234, 0.5);
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .mobile-toggle {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .highlight {
+            background: rgba(102, 126, 234, 0.2);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 2rem 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, #667eea 0%, #764ba2 100%);
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding: 1rem 0;
+            width: 50%;
+        }
+
+        .timeline-item:nth-child(odd) {
+            text-align: right;
+            padding-right: 3rem;
+        }
+
+        .timeline-item:nth-child(even) {
+            left: 50%;
+            padding-left: 3rem;
+        }
+
+        .timeline-item::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            top: 1.5rem;
+        }
+
+        .timeline-item:nth-child(odd)::after {
+            right: -10px;
+        }
+
+        .timeline-item:nth-child(even)::after {
+            left: -10px;
+        }
+
+        @media (max-width: 768px) {
+            .timeline::before {
+                left: 2rem;
+            }
+
+            .timeline-item {
+                width: 100%;
+                padding-left: 4rem !important;
+                text-align: left !important;
+            }
+
+            .timeline-item:nth-child(even) {
+                left: 0;
+            }
+
+            .timeline-item::after {
+                left: 1.5rem !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Toggle -->
+    <div class="mobile-toggle" onclick="toggleSidebar()">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12h18M3 6h18M3 18h18"></path>
+        </svg>
+    </div>
+
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <h1>Retentlytics AI</h1>
+        
+        <div class="nav-section">
+            <h3>Бизнес-концепция</h3>
+            <div class="nav-item active" onclick="showSection('overview')">Обзор проекта</div>
+            <div class="nav-item" onclick="showSection('business-model')">Бизнес-модель</div>
+            <div class="nav-item" onclick="showSection('roadmap')">Продуктовая дорожная карта</div>
+        </div>
+
+        <div class="nav-section">
+            <h3>Продукт</h3>
+            <div class="nav-item" onclick="showSection('user-personas')">Портреты пользователей</div>
+            <div class="nav-item" onclick="showSection('modules')">Ключевые модули</div>
+            <div class="nav-item" onclick="showSection('use-cases')">Сценарии использования</div>
+        </div>
+
+        <div class="nav-section">
+            <h3>Архитектура</h3>
+            <div class="nav-item" onclick="showSection('system-architecture')">Системная архитектура</div>
+            <div class="nav-item" onclick="showSection('database')">Схема базы данных</div>
+            <div class="nav-item" onclick="showSection('ai-agents')">AI-агенты</div>
+            <div class="nav-item" onclick="showSection('integrations')">Интеграции</div>
+        </div>
+
+        <div class="nav-section">
+            <h3>Управление</h3>
+            <div class="nav-item" onclick="showSection('team')">Команда проекта</div>
+            <div class="nav-item" onclick="showSection('budget')">Бюджет</div>
+            <div class="nav-item" onclick="showSection('risks')">Матрица рисков</div>
+            <div class="nav-item" onclick="showSection('plan')">План разработки</div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Overview Section -->
+        <section class="section active" id="overview">
+            <div class="section-header">
+                <h2>Обзор проекта Retentlytics AI</h2>
+                <p>AI-ассистент для автоматизации и оптимизации процессов удержания игроков в онлайн-казино</p>
+            </div>
+
+            <!-- Discovery Phase Card -->
+            <div class="card" style="background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%); border: 2px solid rgba(102, 126, 234, 0.3);">
+                <h3>🔍 Discovery-фаза: от гипотез к системе, способной масштабироваться</h3>
+                
+                <p style="margin-bottom: 1.5rem;">На этапе Discovery мы провели глубокое исследование рынка iGaming и текущих решений в области удержания игроков. Особое внимание было уделено функциональным особенностям работы retention-специалиста в казино — как в ручных, так и автоматизированных форматах.</p>
+                
+                <div style="background: rgba(255, 255, 255, 0.05); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem;">
+                    <h4 style="color: #667eea; margin-bottom: 1rem;">💎 Ключевой инсайт Discovery:</h4>
+                    <p>Основная ценность сервиса aiGaming — не просто автоматизация сценариев удержания, а:</p>
+                    <ul style="list-style: none; padding-left: 1rem; margin-top: 0.5rem;">
+                        <li>✓ Постоянная AI-аналитика исторических данных</li>
+                        <li>✓ Автоматическая доработка сценариев и креативов для повышения конверсии</li>
+                        <li>✓ Фокус на конечную метрику клиента — прибыль от удержанных игроков</li>
+                    </ul>
+                </div>
+
+                <div class="grid grid-2" style="gap: 1rem; margin-bottom: 1.5rem;">
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
+                        <h4 style="color: #764ba2; margin-bottom: 0.5rem;">📋 Что мы реализовали:</h4>
+                        <ul style="font-size: 0.95rem; line-height: 1.6;">
+                            <li>Проработку всех пользовательских сценариев и CJM</li>
+                            <li>Кликабельный прототип интерфейса</li>
+                            <li>Формализацию архитектуры платформы</li>
+                            <li>Техническое задание для команд</li>
+                        </ul>
+                    </div>
+                    <div style="background: rgba(255, 255, 255, 0.05); padding: 1rem; border-radius: 8px;">
+                        <h4 style="color: #f093fb; margin-bottom: 0.5rem;">🎯 Результат Discovery:</h4>
+                        <p style="font-size: 0.95rem;">Это делает платформу эффективной, понятной и легко внедряемой даже для небольших команд казино без собственной продуктовой экспертизы.</p>
+                        <p style="font-size: 0.95rem; margin-top: 0.5rem;"><strong>Мы полностью готовы к разработке и укладываемся в согласованные сроки.</strong></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card pulse">
+                    <h3>🎯 Миссия</h3>
+                    <p>Предоставить онлайн-казино и гемблинг-платформам AI-ассистента, который автоматизирует процессы удержания игроков, превращая данные в рост выручки и LTV.</p>
+                </div>
+
+                <div class="card">
+                    <h3>🚀 Позиционирование</h3>
+                    <p>Автономный AI-агент по удержанию, который берет на себя рутинные задачи retention-специалистов и риск-менеджеров, от глубокой сегментации до запуска персонализированных multi-канальных кампаний.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>💡 Ключевые преимущества</h3>
+                <div class="grid grid-3">
+                    <div class="feature-card">
+                        <h4>🤖 AI-автоматизация</h4>
+                        <p>Интеллектуальная сегментация и генерация сценариев</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Предиктивная аналитика</h4>
+                        <p>Прогнозирование churn и LTV игроков</p>
+                    </div>
+                    <div class="feature-card">
+                        <h4>🔄 Омниканальность</h4>
+                        <p>Email, SMS, AI-звонки, Push в одной системе</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Business Model Section -->
+        <section class="section" id="business-model">
+            <div class="section-header">
+                <h2>Бизнес-модель</h2>
+                <p>Гибридная модель монетизации для низкого порога входа и масштабирования</p>
+            </div>
+
+            <div class="card">
+                <h3>💰 Модель монетизации</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Компонент</th>
+                                <th>Описание</th>
+                                <th>Модель оплаты</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><span class="highlight">Setup Fee</span></td>
+                                <td>Интеграция и настройка универсального коннектора</td>
+                                <td>Единоразовый платеж</td>
+                            </tr>
+                            <tr>
+                                <td><span class="highlight">SaaS Fee</span></td>
+                                <td>Доступ к платформе с базовым функционалом</td>
+                                <td>Ежемесячная подписка</td>
+                            </tr>
+                            <tr>
+                                <td><span class="highlight">Pay-as-you-grow</span></td>
+                                <td>% от выручки с CRM-кампаний</td>
+                                <td>Revenue share</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📈 Проекция роста</h3>
+                <div class="chart-container">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Roadmap Section -->
+        <section class="section" id="roadmap">
+            <div class="section-header">
+                <h2>Продуктовая дорожная карта</h2>
+                <p>Поэтапный план развития продукта</p>
+            </div>
+
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="card">
+                        <h4>MVP Development</h4>
+                        <p><strong>~12 недель (20.07 - 10.10)</strong></p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>✓ Интеграция через Webhook</li>
+                            <li>✓ AI-сегментация</li>
+                            <li>✓ Конструктор сценариев</li>
+                            <li>✓ Email, SMS, AI Calls</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="card">
+                        <h4>Post-MVP: AI Optimization</h4>
+                        <p><strong>~8 недель (11.10 - 05.12)</strong></p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>✓ Дообучение AI-моделей</li>
+                            <li>✓ Предиктивная аналитика</li>
+                            <li>✓ AI Support Agent</li>
+                            <li>✓ Расширение интеграций</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="timeline-item">
+                    <div class="card">
+                        <h4>Launch & Scale</h4>
+                        <p><strong>Начиная с 06.12</strong></p>
+                        <ul style="list-style: none; padding: 0;">
+                            <li>✓ Публичный запуск</li>
+                            <li>✓ Enterprise функции</li>
+                            <li>✓ CRM интеграции</li>
+                            <li>✓ Выход в GameDev</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- User Personas Section -->
+        <section class="section" id="user-personas">
+            <div class="section-header">
+                <h2>Портреты пользователей</h2>
+                <p>Ключевые пользователи системы и их потребности</p>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>👨‍💼 Алексей, CRM Manager</h3>
+                    <h4>Цели:</h4>
+                    <ul>
+                        <li>Повысить LTV и Retention Rate</li>
+                        <li>Увеличить доход от CRM</li>
+                        <li>Быстро тестировать гипотезы</li>
+                    </ul>
+                    <h4 style="margin-top: 1rem;">Боли:</h4>
+                    <ul>
+                        <li>"Часы на ручную выгрузку в Excel"</li>
+                        <li>"CRM-системы негибкие"</li>
+                        <li>"Сложно понять причину падения метрик"</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>👨‍💻 Виктор, Risk Manager</h3>
+                    <h4>Цели:</h4>
+                    <ul>
+                        <li>Минимизировать потери от мошенничества</li>
+                        <li>Выявлять рискованных игроков</li>
+                        <li>Real-time контроль финансов</li>
+                    </ul>
+                    <h4 style="margin-top: 1rem;">Боли:</h4>
+                    <ul>
+                        <li>"Нужен real-time апдейт по NGR"</li>
+                        <li>"Нет единого профиля игрока"</li>
+                        <li>"Сложно фильтровать по паттернам"</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modules Section -->
+        <section class="section" id="modules">
+            <div class="section-header">
+                <h2>Ключевые модули продукта</h2>
+                <p>Взаимосвязанные компоненты системы</p>
+            </div>
+
+            <div class="graph-container" id="modulesGraph">
+                <div class="graph-controls">
+                    <button onclick="resetModulesGraph()">Сбросить</button>
+                    <button onclick="fitModulesGraph()">По размеру</button>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 2rem;">
+                <h3>🤖 Детализация AI Core и субагентов</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Субагент</th>
+                                <th>Основные задачи</th>
+                                <th>Используемые инструменты</th>
+                                <th>Выходные данные</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Segment Agent</strong><br><code>generate-segments.ts</code></td>
+                                <td>
+                                    • Анализ поведения игроков<br>
+                                    • Создание динамических сегментов<br>
+                                    • NL-запросы в правила фильтрации
+                                </td>
+                                <td>
+                                    • Firestore Queries<br>
+                                    • NLP Parser<br>
+                                    • Pattern Recognition
+                                </td>
+                                <td>
+                                    • JSON правила сегментации<br>
+                                    • Список userId<br>
+                                    • Обоснование сегмента
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Scenario Agent</strong><br><code>generate-scenario.ts</code></td>
+                                <td>
+                                    • Генерация retention-сценариев<br>
+                                    • Оптимизация последовательности<br>
+                                    • A/B тест конфигурация
+                                </td>
+                                <td>
+                                    • Template Engine<br>
+                                    • Flow Builder<br>
+                                    • Historical Analysis
+                                </td>
+                                <td>
+                                    • ReactFlow JSON<br>
+                                    • Timing параметры<br>
+                                    • Success metrics
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Content Agent</strong><br><code>generate-content.ts</code></td>
+                                <td>
+                                    • Персонализация сообщений<br>
+                                    • Генерация креативов<br>
+                                    • Адаптация под канал
+                                </td>
+                                <td>
+                                    • Template Engine<br>
+                                    • NLP Parser<br>
+                                    • Tone Analyzer
+                                </td>
+                                <td>
+                                    • Email/SMS тексты<br>
+                                    • Call скрипты<br>
+                                    • Push контент
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Insights Agent</strong><br><code>explain-metrics.ts</code></td>
+                                <td>
+                                    • Анализ падения метрик<br>
+                                    • Выявление аномалий<br>
+                                    • Actionable рекомендации
+                                </td>
+                                <td>
+                                    • Analytics Engine<br>
+                                    • Prediction Models<br>
+                                    • Correlation Analysis
+                                </td>
+                                <td>
+                                    • Инсайты и причины<br>
+                                    • Рекомендации<br>
+                                    • Прогнозы
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Risk Agent</strong><br><code>risk-assessment.ts</code></td>
+                                <td>
+                                    • Оценка риска игроков<br>
+                                    • Выявление bonus abuse<br>
+                                    • Fraud detection
+                                </td>
+                                <td>
+                                    • Prediction Models<br>
+                                    • Pattern Matching<br>
+                                    • Behavioral Analysis
+                                </td>
+                                <td>
+                                    • Risk scores<br>
+                                    • Alert flags<br>
+                                    • Action suggestions
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Optimization Agent</strong><br><code>optimize-campaigns.ts</code></td>
+                                <td>
+                                    • Оптимизация кампаний<br>
+                                    • Управление A/B тестами<br>
+                                    • ROI максимизация
+                                </td>
+                                <td>
+                                    • A/B Test Framework<br>
+                                    • Analytics Engine<br>
+                                    • ML Optimizer
+                                </td>
+                                <td>
+                                    • Оптимальные параметры<br>
+                                    • Test winners<br>
+                                    • ROI projections
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="feature-card">
+                    <h4>🎯 Command Center</h4>
+                    <p>Главный дашборд с KPI и AI-рекомендациями</p>
+                </div>
+                <div class="feature-card">
+                    <h4>👤 Player 360°</h4>
+                    <p>Комплексный профиль каждого игрока</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔍 Segment Builder</h4>
+                    <p>AI-ассистированное создание сегментов</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🔄 Scenario Builder</h4>
+                    <p>Визуальный конструктор retention-цепочек</p>
+                </div>
+                <div class="feature-card">
+                    <h4>📊 Analytics</h4>
+                    <p>Глубокая аналитика по кампаниям</p>
+                </div>
+                <div class="feature-card">
+                    <h4>🤖 AI Core</h4>
+                    <p>Набор Genkit-агентов для автоматизации</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Use Cases Section -->
+        <section class="section" id="use-cases">
+            <div class="section-header">
+                <h2>Ключевые сценарии использования</h2>
+                <p>Примеры практического применения системы</p>
+            </div>
+
+            <div class="card">
+                <h3>UC-01: Автоматическая реактивация VIP-игроков</h3>
+                <div class="grid grid-2" style="margin-bottom: 2rem;">
+                    <div>
+                        <h4>📋 Описание сценария:</h4>
+                        <p>Алексей (CRM Manager) хочет автоматически возвращать в игру VIP-игроков, которые не заходили более 14 дней. Система должна использовать AI для создания персонализированного подхода.</p>
+                        
+                        <h4 style="margin-top: 1rem;">🎯 Бизнес-цель:</h4>
+                        <ul>
+                            <li>Снизить churn rate VIP-сегмента на 25%</li>
+                            <li>Увеличить LTV реактивированных игроков</li>
+                            <li>Автоматизировать процесс без участия человека</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>🔄 Детали сценария:</h4>
+                        <ul>
+                            <li><strong>Триггер:</strong> Попадание в сегмент "Спящие VIP"</li>
+                            <li><strong>Канал 1:</strong> AI-звонок через 1 час</li>
+                            <li><strong>Условие:</strong> Если звонок не удался</li>
+                            <li><strong>Канал 2:</strong> Персонализированный Email</li>
+                            <li><strong>Результат:</strong> Push при активации бонуса</li>
+                        </ul>
+                        
+                        <h4 style="margin-top: 1rem;">📊 Ожидаемые метрики:</h4>
+                        <p>Reactivation Rate: 35-40%<br>
+                        Время на настройку: 5 минут<br>
+                        ROI кампании: 250%+</p>
+                    </div>
+                </div>
+                <div class="graph-container" id="useCase1Graph" style="height: 400px;">
+                    <div class="graph-controls">
+                        <button onclick="resetUseCase1()">Сбросить</button>
+                        <button onclick="fitUseCase1()">По размеру</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>UC-02: Анализ падения конверсии и A/B тест</h3>
+                <div class="grid grid-2" style="margin-bottom: 2rem;">
+                    <div>
+                        <h4>📋 Описание сценария:</h4>
+                        <p>Система автоматически обнаружила резкое падение Conversion Rate в кампании "Welcome Chain". AI анализирует причины и предлагает решение через A/B тестирование.</p>
+                        
+                        <h4 style="margin-top: 1rem;">🎯 Бизнес-цель:</h4>
+                        <ul>
+                            <li>Быстро выявлять проблемы в кампаниях</li>
+                            <li>Автоматически предлагать решения</li>
+                            <li>Минимизировать потери от неэффективных кампаний</li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4>🔍 AI-анализ включает:</h4>
+                        <ul>
+                            <li>Сравнение с историческими данными</li>
+                            <li>Анализ изменений в кампании</li>
+                            <li>Корреляция с внешними факторами</li>
+                            <li>Генерация гипотез для тестирования</li>
+                        </ul>
+                        
+                        <h4 style="margin-top: 1rem;">⚡ Скорость реакции:</h4>
+                        <p>Обнаружение: Real-time<br>
+                        AI-анализ: 30 секунд<br>
+                        Запуск A/B: 2 минуты<br>
+                        Первые результаты: 2 часа</p>
+                    </div>
+                </div>
+                <div class="graph-container" id="useCase2Graph" style="height: 400px;">
+                    <div class="graph-controls">
+                        <button onclick="resetUseCase2()">Сбросить</button>
+                        <button onclick="fitUseCase2()">По размеру</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>UC-03: Предотвращение оттока high-rollers</h3>
+                    <h4>🎰 Сценарий для Risk Manager:</h4>
+                    <p>Виктор получает real-time алерт о резком изменении паттерна игры у крупного игрока.</p>
+                    <ul>
+                        <li><strong>Триггер:</strong> Снижение ставок на 50%+ за 3 дня</li>
+                        <li><strong>AI-анализ:</strong> Определение причины (проигрыш, смена игр, технические проблемы)</li>
+                        <li><strong>Действие:</strong> Персональный менеджер звонит в течение часа</li>
+                        <li><strong>Результат:</strong> Сохранение 70% игроков от ухода</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>UC-04: Выявление бонус-хантеров</h3>
+                    <h4>🚨 Автоматическая защита от абьюза:</h4>
+                    <p>AI анализирует поведенческие паттерны новых игроков в real-time.</p>
+                    <ul>
+                        <li><strong>Индикаторы:</strong> Множественные аккаунты, игра только на бонусы, быстрый вывод</li>
+                        <li><strong>AI Score:</strong> Вероятность bonus abuse от 0 до 100</li>
+                        <li><strong>Автоматика:</strong> Блокировка бонусов при score > 80</li>
+                        <li><strong>Точность:</strong> 95% true positive, 2% false positive</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- System Architecture Section -->
+        <section class="section" id="system-architecture">
+            <div class="section-header">
+                <h2>Системная архитектура</h2>
+                <p>Техническая структура проекта</p>
+            </div>
+
+            <div class="graph-container" id="architectureGraph">
+                <div class="graph-controls">
+                    <button onclick="resetArchitecture()">Сбросить</button>
+                    <button onclick="fitArchitecture()">По размеру</button>
+                </div>
+            </div>
+
+            <div class="grid grid-3">
+                <div class="feature-card">
+                    <h4>Frontend</h4>
+                    <p>Next.js + React + shadcn/ui</p>
+                </div>
+                <div class="feature-card">
+                    <h4>Backend</h4>
+                    <p>Next.js API Routes</p>
+                </div>
+                <div class="feature-card">
+                    <h4>AI Core</h4>
+                    <p>Firebase Genkit + Google Gemini</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Database Section -->
+        <section class="section" id="database">
+            <div class="section-header">
+                <h2>Схема базы данных</h2>
+                <p>Структура хранения данных в Firestore</p>
+            </div>
+
+            <div class="graph-container" id="databaseGraph">
+                <div class="graph-controls">
+                    <button onclick="resetDatabase()">Сбросить</button>
+                    <button onclick="fitDatabase()">По размеру</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Agents Section -->
+        <section class="section" id="ai-agents">
+            <div class="section-header">
+                <h2>Архитектура AI-агентов</h2>
+                <p>Система взаимодействующих AI-агентов на Genkit</p>
+            </div>
+
+            <div class="graph-container" id="aiAgentsGraph">
+                <div class="graph-controls">
+                    <button onclick="resetAIAgents()">Сбросить</button>
+                    <button onclick="fitAIAgents()">По размеру</button>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Агент</th>
+                            <th>Цель</th>
+                            <th>Genkit Flows</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Агент Анализа и Сегментации</td>
+                            <td>Анализ данных, создание сегментов</td>
+                            <td>generate-segments.ts</td>
+                        </tr>
+                        <tr>
+                            <td>Агент Генерации Сценариев</td>
+                            <td>Создание retention-сценариев</td>
+                            <td>generate-churn-scenario.ts</td>
+                        </tr>
+                        <tr>
+                            <td>Агент Генерации Контента</td>
+                            <td>Персонализированный контент</td>
+                            <td>generate-communication-content.ts</td>
+                        </tr>
+                        <tr>
+                            <td>Агент Инсайтов и Прогнозов</td>
+                            <td>Аналитика и рекомендации</td>
+                            <td>explain-metric-drop.ts</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Integrations Section -->
+        <section class="section" id="integrations">
+            <div class="section-header">
+                <h2>Стратегия интеграций</h2>
+                <p>Входящие и исходящие интеграции системы</p>
+            </div>
+
+            <div class="card">
+                <h3>📥 Универсальный коннектор казино</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Категория</th>
+                                <th>Поле</th>
+                                <th>Тип</th>
+                                <th>Пример</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="4">Игрок</td>
+                                <td>userId</td>
+                                <td>string</td>
+                                <td>user-12345</td>
+                            </tr>
+                            <tr>
+                                <td>registrationDate</td>
+                                <td>timestamp</td>
+                                <td>2024-07-15T10:00:00Z</td>
+                            </tr>
+                            <tr>
+                                <td>country</td>
+                                <td>string</td>
+                                <td>DE</td>
+                            </tr>
+                            <tr>
+                                <td>currency</td>
+                                <td>string</td>
+                                <td>EUR</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3">Финансы</td>
+                                <td>transactionType</td>
+                                <td>string</td>
+                                <td>deposit, withdrawal</td>
+                            </tr>
+                            <tr>
+                                <td>amount</td>
+                                <td>number</td>
+                                <td>50.00</td>
+                            </tr>
+                            <tr>
+                                <td>balance</td>
+                                <td>number</td>
+                                <td>150.75</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>📤 Коммуникационные каналы</h3>
+                    <ul>
+                        <li><strong>Twilio:</strong> SMS и AI-звонки</li>
+                        <li><strong>SendGrid:</strong> Email-рассылки</li>
+                        <li><strong>SendPulse:</strong> Push-уведомления</li>
+                        <li><strong>Custom Webhook:</strong> Внешние системы</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🔄 CRM интеграции</h3>
+                    <ul>
+                        <li><strong>HubSpot:</strong> Двусторонняя синхронизация</li>
+                        <li><strong>Salesforce:</strong> Контакты и события</li>
+                        <li><strong>API:</strong> RESTful интерфейс</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Team Section -->
+        <section class="section" id="team">
+            <div class="section-header">
+                <h2>Команда проекта</h2>
+                <p>Структура команды для разработки MVP</p>
+            </div>
+
+            <div class="card">
+                <h3>👥 Lean MVP Team</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Роль</th>
+                                <th>FTE</th>
+                                <th>Ключевые задачи</th>
+                                <th>Ставка ($/мес)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Tech Lead</td>
+                                <td>1.0</td>
+                                <td>Техническое руководство, архитектура, код-ревью, менторинг</td>
+                                <td>$6,000</td>
+                            </tr>
+                            <tr>
+                                <td>Product/Project Manager</td>
+                                <td>1.0</td>
+                                <td>Управление проектом, коммуникация с клиентом, приоритизация</td>
+                                <td>$5,000</td>
+                            </tr>
+                            <tr>
+                                <td>Full-Stack Developer (Senior)</td>
+                                <td>1.0</td>
+                                <td>Архитектура, backend, сложные интеграции, код-ревью</td>
+                                <td>$6,500</td>
+                            </tr>
+                            <tr>
+                                <td>Full-Stack Developer (Mid)</td>
+                                <td>1.0</td>
+                                <td>Frontend разработка, UI компоненты, простые API</td>
+                                <td>$2,500</td>
+                            </tr>
+                            <tr>
+                                <td>Data Scientist / AI Developer</td>
+                                <td>1.0</td>
+                                <td>AI-агенты, Genkit flows, ML модели, промпт-инжиниринг</td>
+                                <td>$5,000</td>
+                            </tr>
+                            <tr>
+                                <td>QA Engineer</td>
+                                <td>0.5</td>
+                                <td>Тестирование, тест-кейсы, E2E проверка</td>
+                                <td>$1,000</td>
+                            </tr>
+                            <tr style="background: rgba(102, 126, 234, 0.1);">
+                                <td><strong>Итого ФОТ:</strong></td>
+                                <td><strong>5.5</strong></td>
+                                <td></td>
+                                <td><strong>$26,000</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📊 Распределение ролей</h3>
+                <div class="chart-container">
+                    <canvas id="teamChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Budget Section -->
+        <section class="section" id="budget">
+            <div class="section-header">
+                <h2>Бюджет проекта</h2>
+                <p>Финансовое планирование на 5 месяцев разработки</p>
+            </div>
+
+            <div class="card">
+                <h3>💰 Общий бюджет</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Статья расходов</th>
+                                <th>$/месяц</th>
+                                <th>За 5 месяцев</th>
+                                <th>Примечания</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>ФОТ (месяцы 1-3)</td>
+                                <td>$26,000</td>
+                                <td>$78,000</td>
+                                <td>Полная команда на этапе активной разработки</td>
+                            </tr>
+                            <tr>
+                                <td>ФОТ (месяцы 4-5)</td>
+                                <td>$20,000</td>
+                                <td>$40,000</td>
+                                <td>Оптимизация после MVP (без Tech Lead)</td>
+                            </tr>
+                            <tr>
+                                <td>UI/UX Designer (Freelance)</td>
+                                <td>-</td>
+                                <td>$3,500</td>
+                                <td>Ситуативный подряд на специфические задачи</td>
+                            </tr>
+                            <tr>
+                                <td>Инфраструктура и API</td>
+                                <td>$1,500</td>
+                                <td>$7,500</td>
+                                <td>Supabase, Convex, Google AI, Twilio, Customer.io</td>
+                            </tr>
+                            <tr>
+                                <td>Прочие расходы</td>
+                                <td>$500</td>
+                                <td>$2,500</td>
+                                <td>Jira, Figma и т.д.</td>
+                            </tr>
+                            <tr style="background: rgba(102, 126, 234, 0.1);">
+                                <td><strong>ИТОГО</strong></td>
+                                <td><strong>варьируется</strong></td>
+                                <td><strong>$131,500</strong></td>
+                                <td><strong>Средний: ~2.16 млн руб/мес</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="background: rgba(102, 126, 234, 0.1); padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem;">
+                    <h4 style="color: #667eea; margin-bottom: 0.5rem;">📊 Динамика ФОТ по месяцам:</h4>
+                    <ul style="list-style: none; padding-left: 0;">
+                        <li><strong>Месяцы 1-3:</strong> $26,000/мес - Полная команда включая Tech Lead для закладки правильной архитектуры и процессов</li>
+                        <li><strong>Месяцы 4-5:</strong> $20,000/мес - После запуска MVP, Tech Lead переходит в консультационный режим (-$6,000)</li>
+                    </ul>
+                    <p style="margin-top: 1rem; font-size: 0.95rem;">Это позволяет оптимально использовать бюджет: максимальная экспертиза на старте и экономия после стабилизации продукта.</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📈 Распределение бюджета</h3>
+                <div class="chart-container">
+                    <canvas id="budgetChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Risks Section -->
+        <section class="section" id="risks">
+            <div class="section-header">
+                <h2>Матрица рисков</h2>
+                <p>Ключевые риски проекта и стратегии митигации</p>
+            </div>
+
+            <div class="card">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Категория</th>
+                                <th>Риск</th>
+                                <th>Вероятность</th>
+                                <th>Влияние</th>
+                                <th>Стратегия митигации</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2">Технический</td>
+                                <td>Сложность интеграции с системами казино</td>
+                                <td><span class="highlight" style="background: rgba(255, 100, 100, 0.3);">Высокая</span></td>
+                                <td><span class="highlight" style="background: rgba(255, 100, 100, 0.3);">Высокое</span></td>
+                                <td>Гибкий универсальный коннектор, документация</td>
+                            </tr>
+                            <tr>
+                                <td>Высокая нагрузка при real-time обработке</td>
+                                <td><span class="highlight" style="background: rgba(255, 200, 100, 0.3);">Средняя</span></td>
+                                <td><span class="highlight" style="background: rgba(255, 100, 100, 0.3);">Высокое</span></td>
+                                <td>Асинхронная обработка, кэширование</td>
+                            </tr>
+                            <tr>
+                                <td>Продукт</td>
+                                <td>Низкая точность AI на старте</td>
+                                <td><span class="highlight" style="background: rgba(255, 200, 100, 0.3);">Средняя</span></td>
+                                <td><span class="highlight" style="background: rgba(255, 100, 100, 0.3);">Высокое</span></td>
+                                <td>Ручная корректировка, AI как Co-pilot</td>
+                            </tr>
+                            <tr>
+                                <td>Данные</td>
+                                <td>Нежелание передавать данные</td>
+                                <td><span class="highlight" style="background: rgba(255, 200, 100, 0.3);">Средняя</span></td>
+                                <td><span class="highlight" style="background: rgba(255, 200, 100, 0.3);">Среднее</span></td>
+                                <td>Демо безопасности, NDA</td>
+                            </tr>
+                            <tr>
+                                <td>Команда</td>
+                                <td>Недостаток экспертизы в гемблинге</td>
+                                <td><span class="highlight" style="background: rgba(100, 255, 100, 0.3);">Низкая</span></td>
+                                <td><span class="highlight" style="background: rgba(255, 200, 100, 0.3);">Среднее</span></td>
+                                <td>Консультации с экспертами</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Development Plan Section -->
+        <section class="section" id="plan">
+            <div class="section-header">
+                <h2>План разработки MVP</h2>
+                <p>Детальный план на первые 3 месяца</p>
+            </div>
+
+            <div class="card">
+                <h3>🚀 Спринты разработки</h3>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Спринт</th>
+                                <th>Недели</th>
+                                <th>Цель</th>
+                                <th>Ключевые результаты</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Sprint 1</td>
+                                <td>1-2</td>
+                                <td>Настройка и ядро</td>
+                                <td>CI/CD, схема БД, UI-кит</td>
+                            </tr>
+                            <tr>
+                                <td>Sprint 2</td>
+                                <td>3-4</td>
+                                <td>Прием данных</td>
+                                <td>Webhook API, Профиль игрока</td>
+                            </tr>
+                            <tr>
+                                <td>Sprint 3</td>
+                                <td>5-6</td>
+                                <td>Сегментация</td>
+                                <td>AI-сегменты, конструктор правил</td>
+                            </tr>
+                            <tr>
+                                <td>Sprint 4</td>
+                                <td>7-8</td>
+                                <td>Конструктор сценариев</td>
+                                <td>ReactFlow builder, AI Co-pilot</td>
+                            </tr>
+                            <tr>
+                                <td>Sprint 5</td>
+                                <td>9-10</td>
+                                <td>Исполнение кампаний</td>
+                                <td>SendGrid, Twilio интеграция</td>
+                            </tr>
+                            <tr>
+                                <td>Sprint 6</td>
+                                <td>11-12</td>
+                                <td>MVP Release</td>
+                                <td>Аналитика, стабилизация</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sprint 1 Detail -->
+            <div class="card">
+                <h3>📅 Sprint 1: Настройка и ядро (Недели 1-2)</h3>
+                <h4>Цель спринта: Заложить техническую основу проекта</h4>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Роль</th>
+                                <th>Задачи</th>
+                                <th>Deliverables</th>
+                                <th>Критерии готовности</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                            <tr>
+                                <td><strong>Tech Lead</strong></td>
+                                <td>
+                                    • Техническое руководство<br>
+                                    • Архитектурные решения<br>
+                                    • Код-ревью всех критических частей<br>
+                                    • Менторинг команды<br>
+                                    • Технические интервью
+                                </td>
+                                <td>
+                                    • Tech decisions log<br>
+                                    • Architecture updates<br>
+                                    • Code review reports<br>
+                                    • Team knowledge base
+                                </td>
+                                <td>
+                                    ✓ Архитектура устойчива<br>
+                                    ✓ Команда следует best practices<br>
+                                    ✓ Технический долг минимален
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Product Manager</strong></td>
+                                <td>
+                                    • Управление бэклогом<br>
+                                    • Планирование спринтов<br>
+                                    • Коммуникация с клиентом<br>
+                                    • Приоритизация задач<br>
+                                    • Документация требований
+                                </td>
+                                <td>
+                                    • Product backlog<br>
+                                    • Sprint plans<br>
+                                    • Requirements docs<br>
+                                    • User stories
+                                </td>
+                                <td>
+                                    ✓ Бэклог приоритизирован<br>
+                                    ✓ Требования задокументированы<br>
+                                    ✓ Команда синхронизирована
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Senior Full-Stack</strong></td>
+                                <td>
+                                    • Архитектура системы<br>
+                                    • Настройка GitHub репозитория<br>
+                                    • CI/CD pipeline (GitHub Actions)<br>
+                                    • Схема БД в Supabase<br>
+                                    • Настройка Convex
+                                </td>
+                                <td>
+                                    • architecture.md<br>
+                                    • .github/workflows<br>
+                                    • Supabase schema<br>
+                                    • Convex config
+                                </td>
+                                <td>
+                                    ✓ Автоматический деплой работает<br>
+                                    ✓ БД создана и доступна<br>
+                                    ✓ Real-time синхронизация готова
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Mid Full-Stack</strong></td>
+                                <td>
+                                    • Инициализация Next.js<br>
+                                    • Настройка Tailwind CSS<br>
+                                    • Базовый Layout<br>
+                                    • UI-кит компонентов<br>
+                                    • Storybook setup
+                                </td>
+                                <td>
+                                    • MainLayout.tsx<br>
+                                    • SidebarNav.tsx<br>
+                                    • KpiCard.tsx<br>
+                                    • Button, Input и др.
+                                </td>
+                                <td>
+                                    ✓ Приложение запускается<br>
+                                    ✓ Storybook работает<br>
+                                    ✓ 10+ базовых компонентов
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Developer</strong></td>
+                                <td>
+                                    • Настройка Genkit<br>
+                                    • Подключение Gemini API<br>
+                                    • Hello World flow<br>
+                                    • Базовые промпты
+                                </td>
+                                <td>
+                                    • genkit.ts config<br>
+                                    • test-flow.ts<br>
+                                    • prompts/templates
+                                </td>
+                                <td>
+                                    ✓ Genkit отвечает на запросы<br>
+                                    ✓ API ключи настроены<br>
+                                    ✓ Costs tracking работает
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>QA Engineer</strong></td>
+                                <td>
+                                    • Test plan документ<br>
+                                    • Выбор инструментов<br>
+                                    • Настройка окружения<br>
+                                    • Первые тест-кейсы
+                                </td>
+                                <td>
+                                    • test-plan.md<br>
+                                    • Jest/Cypress config<br>
+                                    • 20+ test cases
+                                </td>
+                                <td>
+                                    ✓ Тестовое окружение готово<br>
+                                    ✓ Можно запускать тесты<br>
+                                    ✓ План покрытия готов
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sprint 2 Detail -->
+            <div class="card">
+                <h3>📅 Sprint 2: Прием данных и Профиль игрока (Недели 3-4)</h3>
+                <h4>Цель спринта: Реализовать прием данных от казино и отображение игроков</h4>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Роль</th>
+                                <th>Задачи</th>
+                                <th>Deliverables</th>
+                                <th>Критерии готовности</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Team Lead</strong></td>
+                                <td>
+                                    • Webhook API endpoint<br>
+                                    • Data adapter логика<br>
+                                    • Запись в Firestore<br>
+                                    • API авторизация<br>
+                                    • Rate limiting
+                                </td>
+                                <td>
+                                    • /api/webhook<br>
+                                    • adapters/casino.ts<br>
+                                    • middleware/auth.ts<br>
+                                    • API документация
+                                </td>
+                                <td>
+                                    ✓ Webhook принимает данные<br>
+                                    ✓ Данные сохраняются в БД<br>
+                                    ✓ Postman коллекция готова
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full-Stack Dev</strong></td>
+                                <td>
+                                    • Страница списка игроков<br>
+                                    • Таблица с фильтрами<br>
+                                    • Страница профиля<br>
+                                    • KPI виджеты игрока<br>
+                                    • Activity feed
+                                </td>
+                                <td>
+                                    • PlayersPage.tsx<br>
+                                    • PlayersTable.tsx<br>
+                                    • PlayerProfile.tsx<br>
+                                    • PlayerKpiGrid.tsx<br>
+                                    • ActivityFeed.tsx
+                                </td>
+                                <td>
+                                    ✓ Список игроков работает<br>
+                                    ✓ Фильтрация функционирует<br>
+                                    ✓ Профиль отображает данные
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Specialist</strong></td>
+                                <td>
+                                    • Flow для анализа игрока<br>
+                                    • Генерация инсайтов<br>
+                                    • Risk scoring логика<br>
+                                    • Интеграция с UI
+                                </td>
+                                <td>
+                                    • analyze-player.ts<br>
+                                    • player-insights.ts<br>
+                                    • risk-score.ts
+                                </td>
+                                <td>
+                                    ✓ AI анализирует профили<br>
+                                    ✓ Инсайты отображаются<br>
+                                    ✓ Risk score считается
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>QA Engineer</strong></td>
+                                <td>
+                                    • API тесты webhook<br>
+                                    • UI тесты таблицы<br>
+                                    • Тесты профиля<br>
+                                    • Load testing API
+                                </td>
+                                <td>
+                                    • webhook.test.ts<br>
+                                    • players-ui.test.ts<br>
+                                    • Load test report
+                                </td>
+                                <td>
+                                    ✓ 95% покрытие API<br>
+                                    ✓ E2E тесты проходят<br>
+                                    ✓ API держит 1000 rps
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sprint 3 Detail -->
+            <div class="card">
+                <h3>📅 Sprint 3: Сегментация игроков (Недели 5-6)</h3>
+                <h4>Цель спринта: AI-powered сегментация и ручной конструктор</h4>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Роль</th>
+                                <th>Задачи</th>
+                                <th>Deliverables</th>
+                                <th>Критерии готовности</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Team Lead</strong></td>
+                                <td>
+                                    • CRUD API для сегментов<br>
+                                    • Динамические сегменты<br>
+                                    • Cron jobs логика<br>
+                                    • Оптимизация запросов
+                                </td>
+                                <td>
+                                    • /api/segments<br>
+                                    • segment-engine.ts<br>
+                                    • cron/segments.ts
+                                </td>
+                                <td>
+                                    ✓ API полностью готов<br>
+                                    ✓ Сегменты обновляются<br>
+                                    ✓ Производительность OK
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full-Stack Dev</strong></td>
+                                <td>
+                                    • Страница сегментов<br>
+                                    • Rule builder UI<br>
+                                    • AI Co-pilot чат<br>
+                                    • Интеграция с API
+                                </td>
+                                <td>
+                                    • SegmentsPage.tsx<br>
+                                    • RuleBuilder.tsx<br>
+                                    • AiCopilotChat.tsx<br>
+                                    • SegmentModal.tsx
+                                </td>
+                                <td>
+                                    ✓ Можно создавать сегменты<br>
+                                    ✓ Rule builder работает<br>
+                                    ✓ AI чат интегрирован
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Specialist</strong></td>
+                                <td>
+                                    • generate-segments flow<br>
+                                    • NL to rules parser<br>
+                                    • Segment suggestions<br>
+                                    • Промпт оптимизация
+                                </td>
+                                <td>
+                                    • generate-segments.ts<br>
+                                    • nl-parser.ts<br>
+                                    • suggest-segments.ts<br>
+                                    • prompts/segments.md
+                                </td>
+                                <td>
+                                    ✓ AI создает сегменты<br>
+                                    ✓ NL запросы работают<br>
+                                    ✓ Suggestions релевантны
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>QA Engineer</strong></td>
+                                <td>
+                                    • Тесты rule builder<br>
+                                    • AI Co-pilot тесты<br>
+                                    • Segment logic тесты<br>
+                                    • Performance тесты
+                                </td>
+                                <td>
+                                    • segments.test.ts<br>
+                                    • ai-copilot.test.ts<br>
+                                    • Performance report
+                                </td>
+                                <td>
+                                    ✓ Все правила работают<br>
+                                    ✓ AI дает корректные ответы<br>
+                                    ✓ 10k игроков OK
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sprint 4 Detail -->
+            <div class="card">
+                <h3>📅 Sprint 4: Конструктор сценариев (Недели 7-8)</h3>
+                <h4>Цель спринта: Visual scenario builder с AI-ассистентом</h4>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Роль</th>
+                                <th>Задачи</th>
+                                <th>Deliverables</th>
+                                <th>Критерии готовности</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Team Lead</strong></td>
+                                <td>
+                                    • Scenarios API<br>
+                                    • ReactFlow backend<br>
+                                    • Execution engine<br>
+                                    • State management
+                                </td>
+                                <td>
+                                    • /api/scenarios<br>
+                                    • scenario-engine.ts<br>
+                                    • execution-queue.ts
+                                </td>
+                                <td>
+                                    ✓ Сценарии сохраняются<br>
+                                    ✓ Execution готов к интеграции<br>
+                                    ✓ State tracking работает
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full-Stack Dev</strong></td>
+                                <td>
+                                    • ReactFlow setup<br>
+                                    • Custom nodes UI<br>
+                                    • Drag-n-drop panel<br>
+                                    • Config panels
+                                </td>
+                                <td>
+                                    • BuilderPage.tsx<br>
+                                    • CustomNodes/*<br>
+                                    • NodeLibrary.tsx<br>
+                                    • ConfigPanel.tsx
+                                </td>
+                                <td>
+                                    ✓ Можно строить сценарии<br>
+                                    ✓ Все типы нод работают<br>
+                                    ✓ UX интуитивен
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Specialist</strong></td>
+                                <td>
+                                    • Scenario generation<br>
+                                    • Step optimization<br>
+                                    • Content generation<br>
+                                    • Flow validation
+                                </td>
+                                <td>
+                                    • generate-scenario.ts<br>
+                                    • optimize-flow.ts<br>
+                                    • validate-scenario.ts
+                                </td>
+                                <td>
+                                    ✓ AI создает сценарии<br>
+                                    ✓ Оптимизация работает<br>
+                                    ✓ Валидация ловит ошибки
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>QA Engineer</strong></td>
+                                <td>
+                                    • ReactFlow тесты<br>
+                                    • Scenario logic тесты<br>
+                                    • AI generation тесты<br>
+                                    • UX тестирование
+                                </td>
+                                <td>
+                                    • builder.test.ts<br>
+                                    • scenarios.test.ts<br>
+                                    • UX test report
+                                </td>
+                                <td>
+                                    ✓ Все flows работают<br>
+                                    ✓ Нет багов в UI<br>
+                                    ✓ UX score > 8/10
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sprint 5 Detail -->
+            <div class="card">
+                <h3>📅 Sprint 5: Исполнение кампаний (Недели 9-10)</h3>
+                <h4>Цель спринта: Интеграция каналов коммуникации</h4>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Роль</th>
+                                <th>Задачи</th>
+                                <th>Deliverables</th>
+                                <th>Критерии готовности</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Team Lead</strong></td>
+                                <td>
+                                    • SendGrid интеграция<br>
+                                    • Twilio SMS setup<br>
+                                    • Queue management<br>
+                                    • Error handling<br>
+                                    • Retry логика
+                                </td>
+                                <td>
+                                    • channels/email.ts<br>
+                                    • channels/sms.ts<br>
+                                    • queue/processor.ts<br>
+                                    • monitoring setup
+                                </td>
+                                <td>
+                                    ✓ Email отправляются<br>
+                                    ✓ SMS доставляются<br>
+                                    ✓ Retry работает<br>
+                                    ✓ Logs записываются
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full-Stack Dev</strong></td>
+                                <td>
+                                    • Channel config UI<br>
+                                    • Template editor<br>
+                                    • Preview функция<br>
+                                    • Sending status UI
+                                </td>
+                                <td>
+                                    • ChannelConfig.tsx<br>
+                                    • TemplateEditor.tsx<br>
+                                    • MessagePreview.tsx<br>
+                                    • StatusDashboard.tsx
+                                </td>
+                                <td>
+                                    ✓ Можно настроить каналы<br>
+                                    ✓ Preview работает<br>
+                                    ✓ Статусы real-time
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Specialist</strong></td>
+                                <td>
+                                    • Twilio AI calls<br>
+                                    • Content generation<br>
+                                    • Personalization<br>
+                                    • A/B testing logic
+                                </td>
+                                <td>
+                                    • ai-caller.ts<br>
+                                    • generate-content.ts<br>
+                                    • personalize.ts<br>
+                                    • ab-optimizer.ts
+                                </td>
+                                <td>
+                                    ✓ AI звонки работают<br>
+                                    ✓ Контент персонализирован<br>
+                                    ✓ A/B тесты запускаются
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>QA Engineer</strong></td>
+                                <td>
+                                    • Channel тесты<br>
+                                    • Delivery тесты<br>
+                                    • Load testing<br>
+                                    • Integration тесты
+                                </td>
+                                <td>
+                                    • channels.test.ts<br>
+                                    • delivery.test.ts<br>
+                                    • Load test 10k msgs
+                                </td>
+                                <td>
+                                    ✓ 99% delivery rate<br>
+                                    ✓ Нет потерь сообщений<br>
+                                    ✓ 10k/hour capacity
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Sprint 6 Detail -->
+            <div class="card">
+                <h3>📅 Sprint 6: Аналитика и MVP Release (Недели 11-12)</h3>
+                <h4>Цель спринта: Завершение MVP и подготовка к запуску</h4>
+                
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Роль</th>
+                                <th>Задачи</th>
+                                <th>Deliverables</th>
+                                <th>Критерии готовности</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Team Lead</strong></td>
+                                <td>
+                                    • Analytics engine<br>
+                                    • Performance opt<br>
+                                    • Security audit<br>
+                                    • Deploy pipeline<br>
+                                    • Documentation
+                                </td>
+                                <td>
+                                    • analytics/*.ts<br>
+                                    • Security report<br>
+                                    • Deploy guide<br>
+                                    • API docs v1.0
+                                </td>
+                                <td>
+                                    ✓ Все метрики считаются<br>
+                                    ✓ Performance < 200ms<br>
+                                    ✓ Security OK<br>
+                                    ✓ Prod ready
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Full-Stack Dev</strong></td>
+                                <td>
+                                    • Analytics dashboards<br>
+                                    • Charts & reports<br>
+                                    • UI polish<br>
+                                    • Mobile responsive<br>
+                                    • Bug fixes
+                                </td>
+                                <td>
+                                    • AnalyticsPage.tsx<br>
+                                    • ReportsPage.tsx<br>
+                                    • Chart components<br>
+                                    • Mobile fixes
+                                </td>
+                                <td>
+                                    ✓ Все дашборды работают<br>
+                                    ✓ Charts interactive<br>
+                                    ✓ Mobile UI OK<br>
+                                    ✓ 0 critical bugs
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>AI Specialist</strong></td>
+                                <td>
+                                    • AI insights dashboard<br>
+                                    • Metric predictions<br>
+                                    • Anomaly detection<br>
+                                    • Final prompts<br>
+                                    • Cost optimization
+                                </td>
+                                <td>
+                                    • insights-engine.ts<br>
+                                    • predict-metrics.ts<br>
+                                    • detect-anomaly.ts<br>
+                                    • Prompts v1.0
+                                </td>
+                                <td>
+                                    ✓ Insights релевантны<br>
+                                    ✓ Predictions точны<br>
+                                    ✓ Anomalies ловятся<br>
+                                    ✓ AI costs < $0.01/user
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>QA Engineer</strong></td>
+                                <td>
+                                    • Full regression<br>
+                                    • E2E scenarios<br>
+                                    • Performance tests<br>
+                                    • UAT coordination<br>
+                                    • Release testing
+                                </td>
+                                <td>
+                                    • Test report v1.0<br>
+                                    • E2E suite<br>
+                                    • Perf baseline<br>
+                                    • UAT sign-off
+                                </td>
+                                <td>
+                                    ✓ 0 blockers<br>
+                                    ✓ < 5 minor bugs<br>
+                                    ✓ Performance SLA met<br>
+                                    ✓ UAT passed
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>📈 График прогресса</h3>
+                <div class="chart-container">
+                    <canvas id="progressChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Overall Project Progress -->
+            <div class="card">
+                <h3>🎯 Общий прогресс проекта</h3>
+                <div style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <span style="min-width: 100px;">Общий прогресс:</span>
+                        <div style="flex: 1; height: 30px; background: rgba(255, 255, 255, 0.1); border-radius: 15px; position: relative; overflow: hidden;">
+                            <div id="overallProgress" style="height: 100%; background: linear-gradient(90deg, #667eea 0%, #764ba2 100%); border-radius: 15px; width: 0%; transition: width 2s ease;">
+                                <span style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); font-weight: bold;">0%</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="sprintProgressBars" style="margin-top: 2rem;">
+                        <!-- Sprint progress bars will be inserted here -->
+                    </div>
+                </div>
+
+                <h4>📊 Deliverables Timeline</h4>
+                <div class="chart-container" style="height: 500px;">
+                    <canvas id="deliverablesChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Team Contribution -->
+            <div class="card">
+                <h3>👥 Вклад команды в прогресс</h3>
+                <div class="chart-container">
+                    <canvas id="teamContributionChart"></canvas>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from nav items
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked nav item
+            event.target.classList.add('active');
+            
+            // Close sidebar on mobile
+            if (window.innerWidth <= 768) {
+                document.getElementById('sidebar').classList.remove('active');
+            }
+        }
+
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('active');
+        }
+
+        // Initialize all graphs when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeCharts();
+            initializeGraphs();
+        });
+
+        // Charts initialization
+        function initializeCharts() {
+            // Revenue projection chart
+            const revenueCtx = document.getElementById('revenueChart');
+            if (revenueCtx) {
+                new Chart(revenueCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['М1', 'М2', 'М3', 'М4', 'М5', 'М6', 'М7', 'М8', 'М9', 'М10', 'М11', 'М12'],
+                        datasets: [{
+                            label: 'Setup Fees',
+                            data: [50000, 80000, 120000, 150000, 180000, 220000, 250000, 280000, 320000, 350000, 380000, 420000],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'SaaS Revenue',
+                            data: [10000, 25000, 45000, 70000, 100000, 135000, 175000, 220000, 270000, 325000, 385000, 450000],
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Revenue Share',
+                            data: [0, 5000, 15000, 35000, 65000, 105000, 155000, 215000, 285000, 365000, 455000, 555000],
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e0e0e0' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Team distribution chart
+            const teamCtx = document.getElementById('teamChart');
+            if (teamCtx) {
+                new Chart(teamCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Tech Lead', 'Product Manager', 'Senior Full-Stack', 'Mid Full-Stack', 'AI Developer', 'QA Engineer'],
+                        datasets: [{
+                            data: [6000, 5000, 6500, 2500, 5000, 1500],
+                            backgroundColor: [
+                                'rgba(147, 51, 234, 0.8)',
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(118, 75, 162, 0.8)',
+                                'rgba(240, 147, 251, 0.8)',
+                                'rgba(255, 200, 100, 0.8)',
+                                'rgba(100, 255, 100, 0.8)'
+                            ],
+                            borderColor: '#0a0a0a',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { color: '#e0e0e0' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Budget distribution chart
+            const budgetCtx = document.getElementById('budgetChart');
+            if (budgetCtx) {
+                new Chart(budgetCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['ФОТ', 'UI/UX', 'Infrastructure', 'Other'],
+                        datasets: [{
+                            label: 'Расходы ($)',
+                            data: [132500, 3500, 7500, 2500],
+                            backgroundColor: [
+                                'rgba(102, 126, 234, 0.8)',
+                                'rgba(118, 75, 162, 0.8)',
+                                'rgba(240, 147, 251, 0.8)',
+                                'rgba(100, 255, 100, 0.8)'
+                            ],
+                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Progress chart
+            const progressCtx = document.getElementById('progressChart');
+            if (progressCtx) {
+                new Chart(progressCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'],
+                        datasets: [{
+                            label: 'Planned Progress %',
+                            data: [8, 16, 25, 33, 42, 50, 58, 67, 75, 83, 92, 100],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Features Completed',
+                            data: [5, 15, 22, 30, 38, 48, 55, 65, 72, 80, 88, 95],
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e0e0e0' }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            },
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Deliverables Timeline Chart
+            const deliverablesCtx = document.getElementById('deliverablesChart');
+            if (deliverablesCtx) {
+                const deliverables = [
+                    // Sprint 1
+                    { task: 'Architecture Design', assignee: 'Tech Lead', start: 0, duration: 2, sprint: 1 },
+                    { task: 'CI/CD Pipeline', assignee: 'Senior Full-Stack', start: 0, duration: 1, sprint: 1 },
+                    { task: 'DB Schema', assignee: 'Tech Lead', start: 0.5, duration: 1.5, sprint: 1 },
+                    { task: 'UI Kit Components', assignee: 'Mid Full-Stack', start: 0, duration: 2, sprint: 1 },
+                    { task: 'Genkit Setup', assignee: 'AI Developer', start: 0, duration: 1, sprint: 1 },
+                    { task: 'Test Plan', assignee: 'QA Engineer', start: 0, duration: 1, sprint: 1 },
+                    { task: 'Requirements', assignee: 'Product Manager', start: 0, duration: 2, sprint: 1 },
+                    
+                    // Sprint 2
+                    { task: 'Webhook API', assignee: 'Team Lead', start: 2, duration: 1.5, sprint: 2 },
+                    { task: 'Players UI', assignee: 'Full-Stack', start: 2, duration: 2, sprint: 2 },
+                    { task: 'Player Insights', assignee: 'AI Specialist', start: 2.5, duration: 1.5, sprint: 2 },
+                    { task: 'API Tests', assignee: 'QA Engineer', start: 3, duration: 1, sprint: 2 },
+                    
+                    // Sprint 3
+                    { task: 'Segments Engine', assignee: 'Team Lead', start: 4, duration: 2, sprint: 3 },
+                    { task: 'Rule Builder UI', assignee: 'Full-Stack', start: 4, duration: 2, sprint: 3 },
+                    { task: 'AI Segments', assignee: 'AI Specialist', start: 4, duration: 2, sprint: 3 },
+                    { task: 'Segment Tests', assignee: 'QA Engineer', start: 5, duration: 1, sprint: 3 },
+                    
+                    // Sprint 4
+                    { task: 'Scenario API', assignee: 'Team Lead', start: 6, duration: 2, sprint: 4 },
+                    { task: 'ReactFlow Builder', assignee: 'Full-Stack', start: 6, duration: 2, sprint: 4 },
+                    { task: 'Scenario Generation', assignee: 'AI Specialist', start: 6, duration: 2, sprint: 4 },
+                    { task: 'Builder Tests', assignee: 'QA Engineer', start: 7, duration: 1, sprint: 4 },
+                    
+                    // Sprint 5
+                    { task: 'Channel Integration', assignee: 'Team Lead', start: 8, duration: 2, sprint: 5 },
+                    { task: 'Template Editor', assignee: 'Full-Stack', start: 8, duration: 2, sprint: 5 },
+                    { task: 'AI Calls', assignee: 'AI Specialist', start: 8, duration: 2, sprint: 5 },
+                    { task: 'Integration Tests', assignee: 'QA Engineer', start: 9, duration: 1, sprint: 5 },
+                    
+                    // Sprint 6
+                    { task: 'Analytics Engine', assignee: 'Team Lead', start: 10, duration: 2, sprint: 6 },
+                    { task: 'Dashboard UI', assignee: 'Full-Stack', start: 10, duration: 2, sprint: 6 },
+                    { task: 'AI Insights', assignee: 'AI Specialist', start: 10, duration: 2, sprint: 6 },
+                    { task: 'Full Regression', assignee: 'QA Engineer', start: 10, duration: 2, sprint: 6 }
+                ];
+
+                const colors = {
+                    'Tech Lead': 'rgba(147, 51, 234, 0.8)',
+                    'Senior Full-Stack': 'rgba(102, 126, 234, 0.8)',
+                    'Mid Full-Stack': 'rgba(118, 75, 162, 0.8)',
+                    'AI Developer': 'rgba(240, 147, 251, 0.8)',
+                    'QA Engineer': 'rgba(255, 200, 100, 0.8)',
+                    'Product Manager': 'rgba(100, 255, 100, 0.8)'
+                };
+
+                const datasets = Object.keys(colors).map(assignee => ({
+                    label: assignee,
+                    data: deliverables
+                        .filter(d => d.assignee === assignee)
+                        .map(d => ({
+                            x: [d.start, d.start + d.duration],
+                            y: d.task
+                        })),
+                    backgroundColor: colors[assignee],
+                    borderColor: colors[assignee],
+                    borderWidth: 2,
+                    barPercentage: 0.5
+                }));
+
+                new Chart(deliverablesCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: deliverables.map(d => d.task),
+                        datasets: [{
+                            label: 'Deliverables Timeline',
+                            data: deliverables.map(d => ({
+                                x: [d.start, d.start + d.duration],
+                                y: d.task,
+                                assignee: d.assignee
+                            })),
+                            backgroundColor: deliverables.map(d => colors[d.assignee]),
+                            borderColor: 'rgba(255, 255, 255, 0.2)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const item = deliverables[context.dataIndex];
+                                        return `${item.assignee}: Week ${item.start + 1} - Week ${item.start + item.duration}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'linear',
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { 
+                                    color: '#e0e0e0',
+                                    callback: function(value) {
+                                        return 'Week ' + (value + 1);
+                                    }
+                                },
+                                min: 0,
+                                max: 12
+                            },
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Team Contribution Chart
+            const teamContributionCtx = document.getElementById('teamContributionChart');
+            if (teamContributionCtx) {
+                new Chart(teamContributionCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6', 'Week 7', 'Week 8', 'Week 9', 'Week 10', 'Week 11', 'Week 12'],
+                        datasets: [{
+                            label: 'Tech Lead',
+                            data: [20, 35, 45, 60, 70, 80, 85, 90, 94, 97, 99, 100],
+                            borderColor: '#9333ea',
+                            backgroundColor: 'rgba(147, 51, 234, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Senior Full-Stack',
+                            data: [15, 30, 40, 55, 65, 75, 82, 88, 92, 95, 97, 100],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Mid Full-Stack',
+                            data: [10, 25, 35, 48, 58, 68, 75, 82, 87, 92, 95, 98],
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'AI Developer',
+                            data: [5, 15, 30, 45, 60, 70, 78, 85, 90, 94, 97, 100],
+                            borderColor: '#f093fb',
+                            backgroundColor: 'rgba(240, 147, 251, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'QA Engineer',
+                            data: [8, 20, 32, 42, 52, 62, 70, 78, 85, 90, 95, 100],
+                            borderColor: '#ffc864',
+                            backgroundColor: 'rgba(255, 200, 100, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: 'Product Manager',
+                            data: [25, 40, 50, 60, 68, 75, 80, 85, 90, 93, 96, 100],
+                            borderColor: '#64ff64',
+                            backgroundColor: 'rgba(100, 255, 100, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                labels: { color: '#e0e0e0' }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        },
+                        scales: {
+                            y: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { 
+                                    color: '#e0e0e0',
+                                    callback: function(value) {
+                                        return value + '%';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' },
+                                ticks: { color: '#e0e0e0' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Initialize sprint progress bars
+            initializeSprintProgress();
+        }
+
+        // Sprint progress initialization
+        function initializeSprintProgress() {
+            const sprintData = [
+                { name: 'Sprint 1: Настройка и ядро', progress: 100, deliverables: 5 },
+                { name: 'Sprint 2: Прием данных', progress: 100, deliverables: 5 },
+                { name: 'Sprint 3: Сегментация', progress: 85, deliverables: 4 },
+                { name: 'Sprint 4: Конструктор сценариев', progress: 60, deliverables: 4 },
+                { name: 'Sprint 5: Исполнение кампаний', progress: 30, deliverables: 4 },
+                { name: 'Sprint 6: MVP Release', progress: 10, deliverables: 4 }
+            ];
+
+            const container = document.getElementById('sprintProgressBars');
+            if (container) {
+                container.innerHTML = sprintData.map((sprint, index) => `
+                    <div style="margin-bottom: 1rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="font-size: 0.9rem;">${sprint.name}</span>
+                            <span style="font-size: 0.9rem; color: #888;">${sprint.deliverables} deliverables</span>
+                        </div>
+                        <div style="height: 20px; background: rgba(255, 255, 255, 0.1); border-radius: 10px; position: relative; overflow: hidden;">
+                            <div class="sprint-progress" data-progress="${sprint.progress}" style="height: 100%; background: linear-gradient(90deg, ${getSprintColor(index)} 0%, ${getSprintColor(index, true)} 100%); border-radius: 10px; width: 0%; transition: width 2s ease ${index * 0.2}s;">
+                                <span style="position: absolute; right: 5px; top: 50%; transform: translateY(-50%); font-size: 0.8rem; font-weight: bold;">${sprint.progress}%</span>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Animate progress bars
+                setTimeout(() => {
+                    document.querySelectorAll('.sprint-progress').forEach(bar => {
+                        bar.style.width = bar.dataset.progress + '%';
+                    });
+
+                    // Update overall progress
+                    const overallProgress = Math.round(sprintData.reduce((sum, s) => sum + s.progress, 0) / sprintData.length);
+                    const overallBar = document.getElementById('overallProgress');
+                    if (overallBar) {
+                        overallBar.style.width = overallProgress + '%';
+                        overallBar.querySelector('span').textContent = overallProgress + '%';
+                    }
+                }, 100);
+            }
+        }
+
+        function getSprintColor(index, lighter = false) {
+            const colors = [
+                ['#667eea', '#8da0f5'],
+                ['#764ba2', '#9470c2'],
+                ['#f093fb', '#f5b3fc'],
+                ['#4facfe', '#7fc3fe'],
+                ['#43e97b', '#6def9a'],
+                ['#fa709a', '#fc8fb3']
+            ];
+            return colors[index % colors.length][lighter ? 1 : 0];
+        }
+
+        // Cytoscape graphs
+        let graphs = {};
+
+        function initializeGraphs() {
+            // Modules Graph
+            const modulesContainer = document.getElementById('modulesGraph');
+            if (modulesContainer) {
+                graphs.modules = cytoscape({
+                    container: modulesContainer,
+                    elements: [
+                        // Main Modules
+                        { data: { id: 'command', label: 'Command Center', type: 'module' } },
+                        { data: { id: 'player', label: 'Player 360°', type: 'module' } },
+                        { data: { id: 'segment', label: 'Segment Builder', type: 'module' } },
+                        { data: { id: 'scenario', label: 'Scenario Builder', type: 'module' } },
+                        { data: { id: 'analytics', label: 'Analytics', type: 'module' } },
+                        { data: { id: 'settings', label: 'Settings', type: 'module' } },
+                        
+                        // AI Core and Sub-agents
+                        { data: { id: 'ai', label: 'AI Core\n(Genkit Orchestrator)', type: 'ai-core' } },
+                        { data: { id: 'agent-segment', label: 'Segment Agent\ngenerate-segments.ts', type: 'agent' } },
+                        { data: { id: 'agent-scenario', label: 'Scenario Agent\ngenerate-scenario.ts', type: 'agent' } },
+                        { data: { id: 'agent-content', label: 'Content Agent\ngenerate-content.ts', type: 'agent' } },
+                        { data: { id: 'agent-insights', label: 'Insights Agent\nexplain-metrics.ts', type: 'agent' } },
+                        { data: { id: 'agent-risk', label: 'Risk Agent\nrisk-assessment.ts', type: 'agent' } },
+                        { data: { id: 'agent-optimization', label: 'Optimization Agent\noptimize-campaigns.ts', type: 'agent' } },
+                        
+                        // Tools for agents
+                        { data: { id: 'tool-db', label: 'Firestore\nQueries', type: 'tool' } },
+                        { data: { id: 'tool-analytics', label: 'Analytics\nEngine', type: 'tool' } },
+                        { data: { id: 'tool-nlp', label: 'NLP\nParser', type: 'tool' } },
+                        { data: { id: 'tool-prediction', label: 'Prediction\nModels', type: 'tool' } },
+                        { data: { id: 'tool-template', label: 'Template\nEngine', type: 'tool' } },
+                        { data: { id: 'tool-ab', label: 'A/B Test\nFramework', type: 'tool' } },
+                        
+                        // Edges - Module connections
+                        { data: { source: 'ai', target: 'command', type: 'provides' } },
+                        { data: { source: 'ai', target: 'segment', type: 'provides' } },
+                        { data: { source: 'ai', target: 'scenario', type: 'provides' } },
+                        { data: { source: 'player', target: 'segment', type: 'data' } },
+                        { data: { source: 'segment', target: 'scenario', type: 'data' } },
+                        { data: { source: 'scenario', target: 'analytics', type: 'data' } },
+                        { data: { source: 'command', target: 'analytics', type: 'data' } },
+                        
+                        // AI Core to Agents
+                        { data: { source: 'ai', target: 'agent-segment', type: 'orchestrates' } },
+                        { data: { source: 'ai', target: 'agent-scenario', type: 'orchestrates' } },
+                        { data: { source: 'ai', target: 'agent-content', type: 'orchestrates' } },
+                        { data: { source: 'ai', target: 'agent-insights', type: 'orchestrates' } },
+                        { data: { source: 'ai', target: 'agent-risk', type: 'orchestrates' } },
+                        { data: { source: 'ai', target: 'agent-optimization', type: 'orchestrates' } },
+                        
+                        // Agents to Tools
+                        { data: { source: 'agent-segment', target: 'tool-db', type: 'uses' } },
+                        { data: { source: 'agent-segment', target: 'tool-nlp', type: 'uses' } },
+                        { data: { source: 'agent-scenario', target: 'tool-template', type: 'uses' } },
+                        { data: { source: 'agent-content', target: 'tool-template', type: 'uses' } },
+                        { data: { source: 'agent-content', target: 'tool-nlp', type: 'uses' } },
+                        { data: { source: 'agent-insights', target: 'tool-analytics', type: 'uses' } },
+                        { data: { source: 'agent-insights', target: 'tool-prediction', type: 'uses' } },
+                        { data: { source: 'agent-risk', target: 'tool-prediction', type: 'uses' } },
+                        { data: { source: 'agent-risk', target: 'tool-db', type: 'uses' } },
+                        { data: { source: 'agent-optimization', target: 'tool-ab', type: 'uses' } },
+                        { data: { source: 'agent-optimization', target: 'tool-analytics', type: 'uses' } },
+                        
+                        // Inter-agent connections
+                        { data: { source: 'agent-scenario', target: 'agent-content', type: 'requests' } },
+                        { data: { source: 'agent-insights', target: 'agent-optimization', type: 'informs' } },
+                        { data: { source: 'agent-risk', target: 'agent-segment', type: 'informs' } }
+                    ],
+                    style: [
+                        {
+                            selector: 'node[type="module"]',
+                            style: {
+                                'background-color': '#667eea',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': 25,
+                                'font-size': 14,
+                                'border-width': 2,
+                                'border-color': '#764ba2',
+                                'shape': 'round-rectangle',
+                                'text-wrap': 'wrap',
+                                'text-max-width': 120
+                            }
+                        },
+                        {
+                            selector: 'node[type="ai-core"]',
+                            style: {
+                                'background-color': '#764ba2',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': 30,
+                                'font-size': 16,
+                                'font-weight': 'bold',
+                                'border-width': 3,
+                                'border-color': '#f093fb',
+                                'shape': 'hexagon',
+                                'text-wrap': 'wrap',
+                                'text-max-width': 140
+                            }
+                        },
+                        {
+                            selector: 'node[type="agent"]',
+                            style: {
+                                'background-color': '#f093fb',
+                                'label': 'data(label)',
+                                'color': '#000',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': 20,
+                                'font-size': 12,
+                                'border-width': 2,
+                                'border-color': '#764ba2',
+                                'shape': 'ellipse',
+                                'text-wrap': 'wrap',
+                                'text-max-width': 100
+                            }
+                        },
+                        {
+                            selector: 'node[type="tool"]',
+                            style: {
+                                'background-color': '#4facfe',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': 15,
+                                'font-size': 11,
+                                'border-width': 1,
+                                'border-color': '#2980b9',
+                                'shape': 'diamond',
+                                'text-wrap': 'wrap',
+                                'text-max-width': 80
+                            }
+                        },
+                        {
+                            selector: 'edge[type="provides"]',
+                            style: {
+                                'width': 3,
+                                'line-color': '#667eea',
+                                'target-arrow-color': '#667eea',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'line-style': 'solid'
+                            }
+                        },
+                        {
+                            selector: 'edge[type="orchestrates"]',
+                            style: {
+                                'width': 4,
+                                'line-color': '#764ba2',
+                                'target-arrow-color': '#764ba2',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'line-style': 'solid'
+                            }
+                        },
+                        {
+                            selector: 'edge[type="uses"]',
+                            style: {
+                                'width': 2,
+                                'line-color': '#4facfe',
+                                'target-arrow-color': '#4facfe',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'line-style': 'dashed'
+                            }
+                        },
+                        {
+                            selector: 'edge[type="requests"]',
+                            style: {
+                                'width': 2,
+                                'line-color': '#f093fb',
+                                'target-arrow-color': '#f093fb',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'line-style': 'dotted'
+                            }
+                        },
+                        {
+                            selector: 'edge[type="data"]',
+                            style: {
+                                'width': 2,
+                                'line-color': '#42e695',
+                                'target-arrow-color': '#42e695',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier'
+                            }
+                        },
+                        {
+                            selector: 'edge[type="informs"]',
+                            style: {
+                                'width': 2,
+                                'line-color': '#ffc864',
+                                'target-arrow-color': '#ffc864',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'line-style': 'dotted'
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'cose',
+                        animate: true,
+                        animationDuration: 1000,
+                        nodeRepulsion: 8000,
+                        idealEdgeLength: 150,
+                        edgeElasticity: 100,
+                        nestingFactor: 5,
+                        gravity: 50,
+                        numIter: 1000,
+                        componentSpacing: 200
+                    }
+                });
+            }
+
+            // Architecture Graph
+            const architectureContainer = document.getElementById('architectureGraph');
+            if (architectureContainer) {
+                graphs.architecture = cytoscape({
+                    container: architectureContainer,
+                    elements: [
+                        // Frontend Layer
+                        { data: { id: 'browser', label: 'Browser', layer: 'frontend' } },
+                        { data: { id: 'nextjs-fe', label: 'Next.js Frontend', layer: 'frontend' } },
+                        
+                        // Backend Layer
+                        { data: { id: 'supabase', label: 'Supabase Hosting', layer: 'backend' } },
+                        { data: { id: 'nextjs-be', label: 'Next.js Backend', layer: 'backend' } },
+                        { data: { id: 'genkit', label: 'Genkit AI Flows', layer: 'backend' } },
+                        { data: { id: 'supabase-db', label: 'Supabase DB', layer: 'backend' } },
+                        { data: { id: 'convex', label: 'Convex Real-time', layer: 'backend' } },
+                        { data: { id: 'gemini', label: 'Google Gemini', layer: 'backend' } },
+                        
+                        // External Services
+                        { data: { id: 'casino', label: 'Casino Platforms', layer: 'external' } },
+                        { data: { id: 'twilio', label: 'Twilio API', layer: 'external' } },
+                        { data: { id: 'sendgrid', label: 'SendGrid API', layer: 'external' } },
+                        { data: { id: 'customerio', label: 'Customer.io API', layer: 'external' } },
+                        
+                        // Connections
+                        { data: { source: 'browser', target: 'nextjs-fe' } },
+                        { data: { source: 'nextjs-fe', target: 'nextjs-be' } },
+                        { data: { source: 'supabase', target: 'nextjs-fe' } },
+                        { data: { source: 'nextjs-be', target: 'genkit' } },
+                        { data: { source: 'nextjs-be', target: 'supabase-db' } },
+                        { data: { source: 'nextjs-be', target: 'convex' } },
+                        { data: { source: 'genkit', target: 'gemini' } },
+                        { data: { source: 'genkit', target: 'supabase-db' } },
+                        { data: { source: 'convex', target: 'supabase-db' } },
+                        { data: { source: 'casino', target: 'nextjs-be' } },
+                        { data: { source: 'nextjs-be', target: 'twilio' } },
+                        { data: { source: 'nextjs-be', target: 'sendgrid' } },
+                        { data: { source: 'nextjs-be', target: 'customerio' } }
+                    ],
+                    style: [
+                        {
+                            selector: 'node[layer="frontend"]',
+                            style: {
+                                'background-color': '#f093fb',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 100,
+                                'height': 100
+                            }
+                        },
+                        {
+                            selector: 'node[layer="backend"]',
+                            style: {
+                                'background-color': '#667eea',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 100,
+                                'height': 100
+                            }
+                        },
+                        {
+                            selector: 'node[layer="external"]',
+                            style: {
+                                'background-color': '#4facfe',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 100,
+                                'height': 100
+                            }
+                        },
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 2,
+                                'line-color': '#764ba2',
+                                'target-arrow-color': '#764ba2',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier'
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'breadthfirst',
+                        directed: true,
+                        spacingFactor: 1.5
+                    }
+                });
+            }
+
+            // Database Schema Graph
+            const databaseContainer = document.getElementById('databaseGraph');
+            if (databaseContainer) {
+                graphs.database = cytoscape({
+                    container: databaseContainer,
+                    elements: [
+                        // Tables
+                        { data: { id: 'users', label: 'USERS\n\nuserId (PK)\nname\navatarUrl\ndemographics\nfinancial_summary\npredictive_scores' } },
+                        { data: { id: 'events', label: 'EVENTS\n\neventId (PK)\nuserId (FK)\ntype\ndetails\ntimestamp' } },
+                        { data: { id: 'segments', label: 'SEGMENTS\n\nsegmentId (PK)\nname\ndescription\nrules\nis_dynamic' } },
+                        { data: { id: 'campaigns', label: 'CAMPAIGNS\n\ncampaignId (PK)\nname\ndescription' } },
+                        { data: { id: 'scenarios', label: 'SCENARIOS\n\nscenarioId (PK)\ncampaignId (FK)\nname\ntrigger_type\nnodes\nedges' } },
+                        { data: { id: 'logs', label: 'COMMUNICATION_LOGS\n\nlogId (PK)\nuserId (FK)\nscenarioId (FK)\nchannel\nstatus' } },
+                        
+                        // Relations
+                        { data: { source: 'events', target: 'users', label: 'has' } },
+                        { data: { source: 'users', target: 'segments', label: 'belongs to' } },
+                        { data: { source: 'scenarios', target: 'campaigns', label: 'part of' } },
+                        { data: { source: 'logs', target: 'users', label: 'sent to' } },
+                        { data: { source: 'logs', target: 'scenarios', label: 'sent from' } }
+                    ],
+                    style: [
+                        {
+                            selector: 'node',
+                            style: {
+                                'background-color': '#667eea',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': 25,
+                                'shape': 'rectangle',
+                                'text-wrap': 'wrap',
+                                'text-max-width': 180,
+                                'font-size': 11,
+                                'border-width': 2,
+                                'border-color': '#764ba2',
+                                'line-height': 1.3
+                            }
+                        },
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 2,
+                                'line-color': '#764ba2',
+                                'target-arrow-color': '#764ba2',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'label': 'data(label)',
+                                'font-size': 10,
+                                'color': '#aaa'
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'cose',
+                        nodeRepulsion: 8000,
+                        idealEdgeLength: 100,
+                        edgeElasticity: 100,
+                        nestingFactor: 5,
+                        gravity: 80,
+                        numIter: 1000,
+                        initialTemp: 200,
+                        coolingFactor: 0.95,
+                        minTemp: 1.0
+                    }
+                });
+            }
+
+            // AI Agents Graph
+            const aiAgentsContainer = document.getElementById('aiAgentsGraph');
+            if (aiAgentsContainer) {
+                graphs.aiAgents = cytoscape({
+                    container: aiAgentsContainer,
+                    elements: [
+                        // Interface layer
+                        { data: { id: 'copilot', label: 'AI Co-pilot\nChat UI', layer: 'interface' } },
+                        { data: { id: 'dashboard', label: 'Dashboards\n& Builders', layer: 'interface' } },
+                        
+                        // Orchestrator
+                        { data: { id: 'orchestrator', label: 'AI Orchestrator\n(Genkit)', layer: 'orchestrator' } },
+                        
+                        // Agents
+                        { data: { id: 'agent1', label: 'Segment Agent\nАнализ и\nСегментация', layer: 'agent' } },
+                        { data: { id: 'agent2', label: 'Scenario Agent\nГенерация\nСценариев', layer: 'agent' } },
+                        { data: { id: 'agent3', label: 'Content Agent\nГенерация\nКонтента', layer: 'agent' } },
+                        { data: { id: 'agent4', label: 'Insights Agent\nИнсайты и\nПрогнозы', layer: 'agent' } },
+                        { data: { id: 'agent5', label: 'Risk Agent\nОценка\nРисков', layer: 'agent' } },
+                        { data: { id: 'agent6', label: 'Optimization\nAgent', layer: 'agent' } },
+                        
+                        // Data sources
+                        { data: { id: 'db', label: 'База\nДанных', layer: 'data' } },
+                        { data: { id: 'twilio', label: 'Twilio\nAPI', layer: 'data' } },
+                        { data: { id: 'sendgrid', label: 'SendGrid\nAPI', layer: 'data' } },
+                        { data: { id: 'customerio', label: 'Customer.io\nAPI', layer: 'data' } },
+                        
+                        // Connections
+                        { data: { source: 'copilot', target: 'orchestrator' } },
+                        { data: { source: 'dashboard', target: 'orchestrator' } },
+                        { data: { source: 'orchestrator', target: 'agent1' } },
+                        { data: { source: 'orchestrator', target: 'agent2' } },
+                        { data: { source: 'orchestrator', target: 'agent3' } },
+                        { data: { source: 'orchestrator', target: 'agent4' } },
+                        { data: { source: 'orchestrator', target: 'agent5' } },
+                        { data: { source: 'orchestrator', target: 'agent6' } },
+                        { data: { source: 'agent1', target: 'db' } },
+                        { data: { source: 'agent2', target: 'db' } },
+                        { data: { source: 'agent2', target: 'agent3' } },
+                        { data: { source: 'agent4', target: 'db' } },
+                        { data: { source: 'agent5', target: 'db' } },
+                        { data: { source: 'agent6', target: 'db' } },
+                        { data: { source: 'agent2', target: 'twilio' } },
+                        { data: { source: 'agent2', target: 'sendgrid' } },
+                        { data: { source: 'agent2', target: 'customerio' } },
+                        { data: { source: 'agent3', target: 'customerio' } }
+                    ],
+                    style: [
+                        {
+                            selector: 'node',
+                            style: {
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'text-wrap': 'wrap',
+                                'text-max-width': '80px',
+                                'font-size': '12px',
+                                'min-width': '120px',
+                                'min-height': '80px',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': '20px'
+                            }
+                        },
+                        {
+                            selector: 'node[layer="interface"]',
+                            style: {
+                                'background-color': '#f093fb',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'shape': 'round-rectangle',
+                                'border-width': 2,
+                                'border-color': '#d946ef'
+                            }
+                        },
+                        {
+                            selector: 'node[layer="orchestrator"]',
+                            style: {
+                                'background-color': '#764ba2',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'font-size': '14px',
+                                'font-weight': 'bold',
+                                'shape': 'hexagon',
+                                'border-width': 3,
+                                'border-color': '#f093fb',
+                                'min-width': '160px',
+                                'min-height': '100px'
+                            }
+                        },
+                        {
+                            selector: 'node[layer="agent"]',
+                            style: {
+                                'background-color': '#667eea',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'shape': 'ellipse',
+                                'border-width': 2,
+                                'border-color': '#4c1d95'
+                            }
+                        },
+                        {
+                            selector: 'node[layer="data"]',
+                            style: {
+                                'background-color': '#4facfe',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'shape': 'barrel',
+                                'border-width': 2,
+                                'border-color': '#0ea5e9'
+                            }
+                        },
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 2,
+                                'line-color': '#64748b',
+                                'target-arrow-color': '#64748b',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'control-point-step-size': 40
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'cose',
+                        animate: false,
+                        nodeRepulsion: 400000,
+                        nodeOverlap: 100,
+                        idealEdgeLength: 200,
+                        edgeElasticity: 100,
+                        nestingFactor: 5,
+                        gravity: 25,
+                        numIter: 2000,
+                        initialTemp: 200,
+                        coolingFactor: 0.95,
+                        minTemp: 1.0,
+                        padding: 50
+                    }
+                });
+
+                // После инициализации применяем кастомную компоновку
+                setTimeout(() => {
+                    if (graphs.aiAgents) {
+                        // Интерфейсный слой - сверху
+                        graphs.aiAgents.$('#copilot').position({ x: 200, y: 50 });
+                        graphs.aiAgents.$('#dashboard').position({ x: 400, y: 50 });
+                        
+                        // Оркестратор - в центре
+                        graphs.aiAgents.$('#orchestrator').position({ x: 300, y: 200 });
+                        
+                        // Агенты - полукругом вокруг оркестратора
+                        graphs.aiAgents.$('#agent1').position({ x: 100, y: 350 });
+                        graphs.aiAgents.$('#agent2').position({ x: 250, y: 380 });
+                        graphs.aiAgents.$('#agent3').position({ x: 400, y: 380 });
+                        graphs.aiAgents.$('#agent4').position({ x: 550, y: 350 });
+                        graphs.aiAgents.$('#agent5').position({ x: 150, y: 450 });
+                        graphs.aiAgents.$('#agent6').position({ x: 450, y: 450 });
+                        
+                        // Источники данных - внизу
+                        graphs.aiAgents.$('#db').position({ x: 300, y: 550 });
+                        graphs.aiAgents.$('#twilio').position({ x: 100, y: 550 });
+                        graphs.aiAgents.$('#sendgrid').position({ x: 200, y: 550 });
+                        graphs.aiAgents.$('#customerio').position({ x: 400, y: 550 });
+                        
+                        graphs.aiAgents.fit();
+                    }
+                }, 100);
+            }
+
+            // Use Case 1 Graph
+            const useCase1Container = document.getElementById('useCase1Graph');
+            if (useCase1Container) {
+                graphs.useCase1 = cytoscape({
+                    container: useCase1Container,
+                    elements: [
+                        // Steps
+                        { data: { id: 'start', label: 'Старт:\nАлексей открывает\nAI Co-pilot' } },
+                        { data: { id: 'request', label: 'Запрос:\n"Создай сегмент VIP\nс LTV > $2000,\nне логинились 14+ дней"' } },
+                        { data: { id: 'segment', label: 'AI создает\nдинамический\nсегмент' } },
+                        { data: { id: 'scenario_req', label: 'Запрос:\n"Сделай сценарий\nреактивации через\nAI-звонок и Email"' } },
+                        { data: { id: 'scenario', label: 'AI генерирует\nсценарий' } },
+                        { data: { id: 'review', label: 'Алексей\nпроверяет\nсценарий' } },
+                        { data: { id: 'activate', label: 'Активация\nсценария' } },
+                        { data: { id: 'execute', label: 'Автоматическое\nвыполнение:\nзвонки и email' } },
+                        
+                        // Flow
+                        { data: { source: 'start', target: 'request' } },
+                        { data: { source: 'request', target: 'segment' } },
+                        { data: { source: 'segment', target: 'scenario_req' } },
+                        { data: { source: 'scenario_req', target: 'scenario' } },
+                        { data: { source: 'scenario', target: 'review' } },
+                        { data: { source: 'review', target: 'activate' } },
+                        { data: { source: 'activate', target: 'execute' } }
+                    ],
+                    style: [
+                        {
+                            selector: 'node',
+                            style: {
+                                'background-color': '#667eea',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': 20,
+                                'text-wrap': 'wrap',
+                                'text-max-width': 100,
+                                'font-size': 11,
+                                'shape': 'round-rectangle'
+                            }
+                        },
+                        {
+                            selector: '#start',
+                            style: {
+                                'background-color': '#4facfe',
+                                'shape': 'ellipse'
+                            }
+                        },
+                        {
+                            selector: '#execute',
+                            style: {
+                                'background-color': '#42e695',
+                                'shape': 'star'
+                            }
+                        },
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 3,
+                                'line-color': '#764ba2',
+                                'target-arrow-color': '#764ba2',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier'
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'dagre',
+                        rankDir: 'TB',
+                        nodeSep: 50,
+                        rankSep: 80
+                    }
+                });
+            }
+
+            // Use Case 2 Graph
+            const useCase2Container = document.getElementById('useCase2Graph');
+            if (useCase2Container) {
+                graphs.useCase2 = cytoscape({
+                    container: useCase2Container,
+                    elements: [
+                        // Steps
+                        { data: { id: 'alert', label: 'Уведомление:\n"Conversion Rate\nупал на 30%"' } },
+                        { data: { id: 'click', label: 'Алексей\nкликает на\nуведомление' } },
+                        { data: { id: 'insight', label: 'AI инсайт:\n"Падение после\nизменения текста.\nРекомендую A/B тест"' } },
+                        { data: { id: 'navigate', label: 'Переход в\nсценарий\n"Welcome Chain"' } },
+                        { data: { id: 'duplicate', label: 'Дублирование\nсценария' } },
+                        { data: { id: 'abtest', label: 'Создание A/B:\n50% старый email\n50% новый email' } },
+                        { data: { id: 'launch', label: 'Запуск\nобновленного\nсценария' } },
+                        { data: { id: 'monitor', label: 'Мониторинг\nрезультатов\nA/B теста' } },
+                        
+                        // Flow
+                        { data: { source: 'alert', target: 'click' } },
+                        { data: { source: 'click', target: 'insight' } },
+                        { data: { source: 'insight', target: 'navigate' } },
+                        { data: { source: 'navigate', target: 'duplicate' } },
+                        { data: { source: 'duplicate', target: 'abtest' } },
+                        { data: { source: 'abtest', target: 'launch' } },
+                        { data: { source: 'launch', target: 'monitor' } }
+                    ],
+                    style: [
+                        {
+                            selector: 'node',
+                            style: {
+                                'background-color': '#764ba2',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'width': 'label',
+                                'height': 'label',
+                                'padding': 20,
+                                'text-wrap': 'wrap',
+                                'text-max-width': 100,
+                                'font-size': 11,
+                                'shape': 'round-rectangle'
+                            }
+                        },
+                        {
+                            selector: '#alert',
+                            style: {
+                                'background-color': '#ff6b6b',
+                                'shape': 'round-triangle'
+                            }
+                        },
+                        {
+                            selector: '#monitor',
+                            style: {
+                                'background-color': '#42e695',
+                                'shape': 'round-rectangle'
+                            }
+                        },
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 3,
+                                'line-color': '#f093fb',
+                                'target-arrow-color': '#f093fb',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier'
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'dagre',
+                        rankDir: 'TB',
+                        nodeSep: 50,
+                        rankSep: 80
+                    }
+                });
+            }
+        }
+
+        // Graph control functions
+        function resetModulesGraph() {
+            if (graphs.modules) {
+                graphs.modules.reset();
+                graphs.modules.center();
+            }
+        }
+
+        function fitModulesGraph() {
+            if (graphs.modules) {
+                graphs.modules.fit();
+            }
+        }
+
+        function resetArchitecture() {
+            if (graphs.architecture) {
+                graphs.architecture.reset();
+                graphs.architecture.center();
+            }
+        }
+
+        function fitArchitecture() {
+            if (graphs.architecture) {
+                graphs.architecture.fit();
+            }
+        }
+
+        function resetDatabase() {
+            if (graphs.database) {
+                graphs.database.reset();
+                graphs.database.center();
+            }
+        }
+
+        function fitDatabase() {
+            if (graphs.database) {
+                graphs.database.fit();
+            }
+        }
+
+        function resetAIAgents() {
+            if (graphs.aiAgents) {
+                graphs.aiAgents.reset();
+                graphs.aiAgents.center();
+            }
+        }
+
+        function fitAIAgents() {
+            if (graphs.aiAgents) {
+                graphs.aiAgents.fit();
+            }
+        }
+
+        function resetUseCase1() {
+            if (graphs.useCase1) {
+                graphs.useCase1.reset();
+                graphs.useCase1.center();
+            }
+        }
+
+        function fitUseCase1() {
+            if (graphs.useCase1) {
+                graphs.useCase1.fit();
+            }
+        }
+
+        function resetUseCase2() {
+            if (graphs.useCase2) {
+                graphs.useCase2.reset();
+                graphs.useCase2.center();
+            }
+        }
+
+        function fitUseCase2() {
+            if (graphs.useCase2) {
+                graphs.useCase2.fit();
+            }
+        }
+
+        // Initialize graphs when sections become visible
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const graphId = entry.target.id.replace('Graph', '');
+                    if (graphs[graphId]) {
+                        setTimeout(() => {
+                            graphs[graphId].resize();
+                            graphs[graphId].fit();
+                        }, 100);
+                    }
+                }
+            });
+        });
+
+        // Observe all graph containers
+        document.querySelectorAll('.graph-container').forEach(container => {
+            observer.observe(container);
+        });
+    </script>
+</body>
+</html>
+                
