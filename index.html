@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Retentlytics AI - Интерактивная Презентация</title>
+    <title>AIGAMING.BOT - Интерактивная Презентация</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
     <script src="https://cytoscape.org/cytoscape.js-dagre/cytoscape-dagre.js"></script>
@@ -386,7 +386,7 @@
 
     <!-- Sidebar -->
     <nav class="sidebar" id="sidebar">
-        <h1>Retentlytics AI</h1>
+        <h1>AIGAMING.BOT</h1>
         
         <div class="nav-section">
             <h3>Бизнес-концепция</h3>
@@ -424,7 +424,7 @@
         <!-- Overview Section -->
         <section class="section active" id="overview">
             <div class="section-header">
-                <h2>Обзор проекта Retentlytics AI</h2>
+                <h2>Обзор проекта AIGAMING.BOT</h2>
                 <p>AI-ассистент для автоматизации и оптимизации процессов удержания игроков в онлайн-казино</p>
             </div>
 
@@ -821,13 +821,13 @@
                         </ul>
                     </div>
                     <div>
-                        <h4>🔄 Детали сценария:</h4>
+                        <h4>🎰 Система персональных бонусов:</h4>
                         <ul>
-                            <li><strong>Триггер:</strong> Попадание в сегмент "Спящие VIP"</li>
-                            <li><strong>Канал 1:</strong> AI-звонок через 1 час</li>
-                            <li><strong>Условие:</strong> Если звонок не удался</li>
-                            <li><strong>Канал 2:</strong> Персонализированный Email</li>
-                            <li><strong>Результат:</strong> Push при активации бонуса</li>
+                            <li><strong>AI-анализ:</strong> История игр, RTP, любимые слоты</li>
+                            <li><strong>Расчет бонуса:</strong> Индивидуально для каждого игрока</li>
+                            <li><strong>Типы бонусов:</strong> Депозитный, фриспины, кешбэк</li>
+                            <li><strong>A/B тестирование:</strong> Оптимизация конверсии</li>
+                            <li><strong>Активация:</strong> В реал-тайме во время звонка</li>
                         </ul>
                         
                         <h4 style="margin-top: 1rem;">📊 Ожидаемые метрики:</h4>
@@ -3095,21 +3095,29 @@
                         // Steps
                         { data: { id: 'start', label: 'Старт:\nАлексей открывает\nAI Co-pilot' } },
                         { data: { id: 'request', label: 'Запрос:\n"Создай сегмент VIP\nс LTV > $2000,\nне логинились 14+ дней"' } },
-                        { data: { id: 'segment', label: 'AI создает\nдинамический\nсегмент' } },
-                        { data: { id: 'scenario_req', label: 'Запрос:\n"Сделай сценарий\nреактивации через\nAI-звонок и Email"' } },
-                        { data: { id: 'scenario', label: 'AI генерирует\nсценарий' } },
-                        { data: { id: 'review', label: 'Алексей\nпроверяет\nсценарий' } },
+                        { data: { id: 'segment', label: 'AI создает\nдинамический\nсегмент\n(267 игроков)' } },
+                        { data: { id: 'scenario_req', label: 'Запрос:\n"Сделай сценарий\nреактивации с\nперсональным бонусом"' } },
+                        { data: { id: 'ai_analysis', label: 'AI анализирует:\n• История игр\n• Предпочтения\n• Чувствительность\nк бонусам' } },
+                        { data: { id: 'bonus_calc', label: 'AI рассчитывает\nбонусы:\n• 30% - 150% депозит\n• 15-50 фриспинов\n• Кешбэк 10-25%' } },
+                        { data: { id: 'scenario', label: 'AI генерирует\nсценарий с\nA/B тестом бонусов' } },
+                        { data: { id: 'review', label: 'Алексей\nпроверяет ROI\nпрогноз: 280%' } },
                         { data: { id: 'activate', label: 'Активация\nсценария' } },
-                        { data: { id: 'execute', label: 'Автоматическое\nвыполнение:\nзвонки и email' } },
+                        { data: { id: 'call', label: 'AI-звонок:\n"Персональное\nпредложение"' } },
+                        { data: { id: 'bonus_activate', label: 'Активация\nбонуса в\nреал-тайме' } },
+                        { data: { id: 'result', label: 'Результат:\n89 активаций\n(33% конверсия)' } },
                         
                         // Flow
                         { data: { source: 'start', target: 'request' } },
                         { data: { source: 'request', target: 'segment' } },
                         { data: { source: 'segment', target: 'scenario_req' } },
-                        { data: { source: 'scenario_req', target: 'scenario' } },
+                        { data: { source: 'scenario_req', target: 'ai_analysis' } },
+                        { data: { source: 'ai_analysis', target: 'bonus_calc' } },
+                        { data: { source: 'bonus_calc', target: 'scenario' } },
                         { data: { source: 'scenario', target: 'review' } },
                         { data: { source: 'review', target: 'activate' } },
-                        { data: { source: 'activate', target: 'execute' } }
+                        { data: { source: 'activate', target: 'call' } },
+                        { data: { source: 'call', target: 'bonus_activate' } },
+                        { data: { source: 'bonus_activate', target: 'result' } }
                     ],
                     style: [
                         {
@@ -3137,10 +3145,28 @@
                             }
                         },
                         {
-                            selector: '#execute',
+                            selector: '#ai_analysis, #bonus_calc',
+                            style: {
+                                'background-color': '#f093fb',
+                                'border-width': 3,
+                                'border-color': '#d946ef'
+                            }
+                        },
+                        {
+                            selector: '#bonus_activate',
+                            style: {
+                                'background-color': '#ffd700',
+                                'color': '#1a1a1a',
+                                'font-weight': 'bold',
+                                'shape': 'star'
+                            }
+                        },
+                        {
+                            selector: '#result',
                             style: {
                                 'background-color': '#42e695',
-                                'shape': 'star'
+                                'shape': 'round-hexagon',
+                                'font-weight': 'bold'
                             }
                         },
                         {
@@ -3162,14 +3188,9 @@
                     }
                     });
                     
-                    // Принудительное обновление графа
-                    setTimeout(() => {
-                        if (graphs.useCase1) {
-                            graphs.useCase1.resize();
-                            graphs.useCase1.fit();
-                            graphs.useCase1.center();
-                        }
-                    }, 100);
+                    // Сразу подгоняем граф по размеру
+                    graphs.useCase1.resize();
+                    graphs.useCase1.fit();
                 }
             }, 500);
 
@@ -3187,19 +3208,21 @@
                         // Steps
                         { data: { id: 'alert', label: 'Уведомление:\n"Conversion Rate\nупал на 30%"' } },
                         { data: { id: 'click', label: 'Алексей\nкликает на\nуведомление' } },
-                        { data: { id: 'insight', label: 'AI инсайт:\n"Падение после\nизменения текста.\nРекомендую A/B тест"' } },
+                        { data: { id: 'insight', label: 'AI инсайт:\n"Бонус 100% стал\nменее эффективным.\nПопробуем фриспины"' } },
                         { data: { id: 'navigate', label: 'Переход в\nсценарий\n"Welcome Chain"' } },
-                        { data: { id: 'duplicate', label: 'Дублирование\nсценария' } },
-                        { data: { id: 'abtest', label: 'Создание A/B:\n50% старый email\n50% новый email' } },
+                        { data: { id: 'analyze_bonus', label: 'AI анализ:\n• CTR бонусов\n• Активации\n• Отыгрыш' } },
+                        { data: { id: 'new_bonus', label: 'Новая стратегия:\n200 фриспинов\nна топ-слоты' } },
+                        { data: { id: 'abtest', label: 'A/B тест:\n50% депозит 100%\n50% фриспины' } },
                         { data: { id: 'launch', label: 'Запуск\nобновленного\nсценария' } },
-                        { data: { id: 'monitor', label: 'Мониторинг\nрезультатов\nA/B теста' } },
+                        { data: { id: 'monitor', label: 'Результат:\nКонверсия +45%\nROI +120%' } },
                         
                         // Flow
                         { data: { source: 'alert', target: 'click' } },
                         { data: { source: 'click', target: 'insight' } },
                         { data: { source: 'insight', target: 'navigate' } },
-                        { data: { source: 'navigate', target: 'duplicate' } },
-                        { data: { source: 'duplicate', target: 'abtest' } },
+                        { data: { source: 'navigate', target: 'analyze_bonus' } },
+                        { data: { source: 'analyze_bonus', target: 'new_bonus' } },
+                        { data: { source: 'new_bonus', target: 'abtest' } },
                         { data: { source: 'abtest', target: 'launch' } },
                         { data: { source: 'launch', target: 'monitor' } }
                     ],
@@ -3229,10 +3252,27 @@
                             }
                         },
                         {
+                            selector: '#analyze_bonus, #new_bonus',
+                            style: {
+                                'background-color': '#f093fb',
+                                'border-width': 3,
+                                'border-color': '#d946ef'
+                            }
+                        },
+                        {
+                            selector: '#abtest',
+                            style: {
+                                'background-color': '#ffd700',
+                                'color': '#1a1a1a',
+                                'font-weight': 'bold'
+                            }
+                        },
+                        {
                             selector: '#monitor',
                             style: {
                                 'background-color': '#42e695',
-                                'shape': 'round-rectangle'
+                                'shape': 'round-hexagon',
+                                'font-weight': 'bold'
                             }
                         },
                         {
@@ -3254,14 +3294,9 @@
                     }
                     });
                     
-                    // Принудительное обновление графа
-                    setTimeout(() => {
-                        if (graphs.useCase2) {
-                            graphs.useCase2.resize();
-                            graphs.useCase2.fit();
-                            graphs.useCase2.center();
-                        }
-                    }, 100);
+                    // Сразу подгоняем граф по размеру
+                    graphs.useCase2.resize();
+                    graphs.useCase2.fit();
                 }
             }, 500);
         }
