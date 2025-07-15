@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Retentlytics AI - Интерактивная Презентация</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.26.0/cytoscape.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+    <script src="https://cytoscape.org/cytoscape.js-dagre/cytoscape-dagre.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.js"></script>
     <style>
         * {
@@ -834,11 +836,12 @@
                         ROI кампании: 250%+</p>
                     </div>
                 </div>
-                <div class="graph-container" id="useCase1Graph" style="height: 400px;">
+                <div class="graph-container" style="height: 400px;">
                     <div class="graph-controls">
                         <button onclick="resetUseCase1()">Сбросить</button>
                         <button onclick="fitUseCase1()">По размеру</button>
                     </div>
+                    <div id="useCase1Graph" style="height: calc(100% - 50px); width: 100%;"></div>
                 </div>
             </div>
 
@@ -872,11 +875,12 @@
                         Первые результаты: 2 часа</p>
                     </div>
                 </div>
-                <div class="graph-container" id="useCase2Graph" style="height: 400px;">
+                <div class="graph-container" style="height: 400px;">
                     <div class="graph-controls">
                         <button onclick="resetUseCase2()">Сбросить</button>
                         <button onclick="fitUseCase2()">По размеру</button>
                     </div>
+                    <div id="useCase2Graph" style="height: calc(100% - 50px); width: 100%;"></div>
                 </div>
             </div>
 
@@ -3082,9 +3086,9 @@
                 const useCase1Container = document.getElementById('useCase1Graph');
                 if (useCase1Container) {
                     // Убедимся, что контейнер имеет высоту
-                    if (useCase1Container.offsetHeight === 0) {
-                        useCase1Container.style.height = '400px';
-                    }
+                    useCase1Container.style.minHeight = '350px';
+                    console.log('Initializing Use Case 1 Graph, container size:', useCase1Container.offsetWidth, 'x', useCase1Container.offsetHeight);
+                    
                     graphs.useCase1 = cytoscape({
                     container: useCase1Container,
                     elements: [
@@ -3157,6 +3161,15 @@
                         rankSep: 80
                     }
                     });
+                    
+                    // Принудительное обновление графа
+                    setTimeout(() => {
+                        if (graphs.useCase1) {
+                            graphs.useCase1.resize();
+                            graphs.useCase1.fit();
+                            graphs.useCase1.center();
+                        }
+                    }, 100);
                 }
             }, 500);
 
@@ -3165,9 +3178,9 @@
                 const useCase2Container = document.getElementById('useCase2Graph');
                 if (useCase2Container) {
                     // Убедимся, что контейнер имеет высоту
-                    if (useCase2Container.offsetHeight === 0) {
-                        useCase2Container.style.height = '400px';
-                    }
+                    useCase2Container.style.minHeight = '350px';
+                    console.log('Initializing Use Case 2 Graph, container size:', useCase2Container.offsetWidth, 'x', useCase2Container.offsetHeight);
+                    
                     graphs.useCase2 = cytoscape({
                     container: useCase2Container,
                     elements: [
@@ -3240,6 +3253,15 @@
                         rankSep: 80
                     }
                     });
+                    
+                    // Принудительное обновление графа
+                    setTimeout(() => {
+                        if (graphs.useCase2) {
+                            graphs.useCase2.resize();
+                            graphs.useCase2.fit();
+                            graphs.useCase2.center();
+                        }
+                    }, 100);
                 }
             }, 500);
         }
