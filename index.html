@@ -794,7 +794,7 @@
                 </div>
                 <div class="feature-card">
                     <h4>🤖 AI Core</h4>
-                    <p>Набор Genkit-агентов для автоматизации</p>
+                    <p>LangGraph-агенты для интеллектуальной автоматизации</p>
                 </div>
             </div>
         </section>
@@ -927,16 +927,32 @@
 
             <div class="grid grid-3">
                 <div class="feature-card">
-                    <h4>Frontend</h4>
-                    <p>Next.js + React + shadcn/ui</p>
+                    <h4>🎨 Frontend</h4>
+                    <p><strong>React + TypeScript</strong><br>
+                    Современный UI с real-time обновлениями через Convex</p>
                 </div>
                 <div class="feature-card">
-                    <h4>Backend</h4>
-                    <p>Next.js API Routes</p>
+                    <h4>🧠 AI Orchestration</h4>
+                    <p><strong>LangGraph</strong><br>
+                    Управление потоками AI-агентов и координация задач</p>
                 </div>
                 <div class="feature-card">
-                    <h4>AI Core</h4>
-                    <p>Firebase Genkit + Google Gemini</p>
+                    <h4>💾 Data Layer</h4>
+                    <p><strong>Supabase + Convex</strong><br>
+                    PostgreSQL для хранения + Real-time синхронизация</p>
+                </div>
+            </div>
+            <div class="card" style="margin-top: 2rem;">
+                <h3>🔑 Ключевые особенности архитектуры</h3>
+                <div class="grid grid-2">
+                    <div>
+                        <h4>📡 Communication APIs Layer</h4>
+                        <p>Унифицированный интерфейс для работы с внешними сервисами коммуникации (Twilio, SendGrid, Customer.io), обеспечивающий абстракцию и легкую замену провайдеров.</p>
+                    </div>
+                    <div>
+                        <h4>🤖 Multi-Agent System</h4>
+                        <p>Специализированные AI-агенты для сегментации, создания сценариев, генерации контента и аналитики, работающие под управлением LangGraph.</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -960,7 +976,7 @@
         <section class="section" id="ai-agents">
             <div class="section-header">
                 <h2>Архитектура AI-агентов</h2>
-                <p>Система взаимодействующих AI-агентов на Genkit</p>
+                <p>Система взаимодействующих AI-агентов на базе LangGraph</p>
             </div>
 
             <div class="graph-container" id="aiAgentsGraph">
@@ -976,7 +992,7 @@
                         <tr>
                             <th>Агент</th>
                             <th>Цель</th>
-                            <th>Genkit Flows</th>
+                            <th>LangGraph Flows</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1136,7 +1152,7 @@
                             <tr>
                                 <td>Data Scientist / AI Developer</td>
                                 <td>1.0</td>
-                                <td>AI-агенты, Genkit flows, ML модели, промпт-инжиниринг</td>
+                                <td>AI-агенты, LangGraph flows, ML модели, промпт-инжиниринг</td>
                                 <td>$5,000</td>
                             </tr>
                             <tr>
@@ -1467,18 +1483,18 @@
                             <tr>
                                 <td><strong>AI Developer</strong></td>
                                 <td>
-                                    • Настройка Genkit<br>
-                                    • Подключение Gemini API<br>
-                                    • Hello World flow<br>
-                                    • Базовые промпты
+                                    • Настройка LangGraph<br>
+                                    • Интеграция с LLM<br>
+                                    • Базовые агенты<br>
+                                    • Промпт-шаблоны
                                 </td>
                                 <td>
-                                    • genkit.ts config<br>
-                                    • test-flow.ts<br>
+                                    • langgraph/config<br>
+                                    • agents/base.ts<br>
                                     • prompts/templates
                                 </td>
                                 <td>
-                                    ✓ Genkit отвечает на запросы<br>
+                                    ✓ LangGraph граф работает<br>
                                     ✓ API ключи настроены<br>
                                     ✓ Costs tracking работает
                                 </td>
@@ -2270,7 +2286,7 @@
                     { task: 'CI/CD Pipeline', assignee: 'Senior Full-Stack', start: 0, duration: 1, sprint: 1 },
                     { task: 'DB Schema', assignee: 'Tech Lead', start: 0.5, duration: 1.5, sprint: 1 },
                     { task: 'UI Kit Components', assignee: 'Mid Full-Stack', start: 0, duration: 2, sprint: 1 },
-                    { task: 'Genkit Setup', assignee: 'AI Developer', start: 0, duration: 1, sprint: 1 },
+                    { task: 'LangGraph Setup', assignee: 'AI Developer', start: 0, duration: 1, sprint: 1 },
                     { task: 'Test Plan', assignee: 'QA Engineer', start: 0, duration: 1, sprint: 1 },
                     { task: 'Requirements', assignee: 'Product Manager', start: 0, duration: 2, sprint: 1 },
                     
@@ -2536,7 +2552,7 @@
                         { data: { id: 'settings', label: 'Settings', type: 'module' } },
                         
                         // AI Core and Sub-agents
-                        { data: { id: 'ai', label: 'AI Core\n(Genkit Orchestrator)', type: 'ai-core' } },
+                        { data: { id: 'ai', label: 'AI Core\n(LangGraph)', type: 'ai-core' } },
                         { data: { id: 'agent-segment', label: 'Segment Agent\ngenerate-segments.ts', type: 'agent' } },
                         { data: { id: 'agent-scenario', label: 'Scenario Agent\ngenerate-scenario.ts', type: 'agent' } },
                         { data: { id: 'agent-content', label: 'Content Agent\ngenerate-content.ts', type: 'agent' } },
@@ -2746,99 +2762,250 @@
                 });
             }
 
-            // Architecture Graph
+            // Architecture Graph - BPMN стиль
             const architectureContainer = document.getElementById('architectureGraph');
             if (architectureContainer) {
+                // Устанавливаем минимальную высоту
+                architectureContainer.style.minHeight = '600px';
+                
                 graphs.architecture = cytoscape({
                     container: architectureContainer,
                     elements: [
                         // Frontend Layer
-                        { data: { id: 'browser', label: 'Browser', layer: 'frontend' } },
-                        { data: { id: 'nextjs-fe', label: 'Next.js Frontend', layer: 'frontend' } },
+                        { data: { id: 'users', label: '👥 Users', type: 'actor' } },
+                        { data: { id: 'react', label: 'React\nFrontend', type: 'frontend' } },
                         
-                        // Backend Layer
-                        { data: { id: 'supabase', label: 'Supabase Hosting', layer: 'backend' } },
-                        { data: { id: 'nextjs-be', label: 'Next.js Backend', layer: 'backend' } },
-                        { data: { id: 'genkit', label: 'Genkit AI Flows', layer: 'backend' } },
-                        { data: { id: 'supabase-db', label: 'Supabase DB', layer: 'backend' } },
-                        { data: { id: 'convex', label: 'Convex Real-time', layer: 'backend' } },
-                        { data: { id: 'gemini', label: 'Google Gemini', layer: 'backend' } },
+                        // Backend Core
+                        { data: { id: 'api', label: 'API\nGateway', type: 'gateway' } },
+                        { data: { id: 'langgraph', label: 'LangGraph\nOrchestrator', type: 'ai-core' } },
+                        
+                        // Databases
+                        { data: { id: 'supabase', label: 'Supabase\nPostgreSQL', type: 'database' } },
+                        { data: { id: 'convex', label: 'Convex\nReal-time DB', type: 'database' } },
+                        
+                        // AI Agents
+                        { data: { id: 'segment-agent', label: 'Segment\nAgent', type: 'agent' } },
+                        { data: { id: 'scenario-agent', label: 'Scenario\nAgent', type: 'agent' } },
+                        { data: { id: 'content-agent', label: 'Content\nAgent', type: 'agent' } },
+                        { data: { id: 'analytics-agent', label: 'Analytics\nAgent', type: 'agent' } },
+                        
+                        // Communication Layer
+                        { data: { id: 'comm-apis', label: 'Communication\nAPIs', type: 'service' } },
                         
                         // External Services
-                        { data: { id: 'casino', label: 'Casino Platforms', layer: 'external' } },
-                        { data: { id: 'twilio', label: 'Twilio API', layer: 'external' } },
-                        { data: { id: 'sendgrid', label: 'SendGrid API', layer: 'external' } },
-                        { data: { id: 'customerio', label: 'Customer.io API', layer: 'external' } },
+                        { data: { id: 'twilio', label: 'Twilio\n(Calls/SMS)', type: 'external' } },
+                        { data: { id: 'sendgrid', label: 'SendGrid\n(Email)', type: 'external' } },
+                        { data: { id: 'customerio', label: 'Customer.io\n(Push)', type: 'external' } },
+                        
+                        // External Data Sources
+                        { data: { id: 'casino-api', label: 'Casino\nAPIs', type: 'external' } },
+                        { data: { id: 'payment-api', label: 'Payment\nProviders', type: 'external' } },
                         
                         // Connections
-                        { data: { source: 'browser', target: 'nextjs-fe' } },
-                        { data: { source: 'nextjs-fe', target: 'nextjs-be' } },
-                        { data: { source: 'supabase', target: 'nextjs-fe' } },
-                        { data: { source: 'nextjs-be', target: 'genkit' } },
-                        { data: { source: 'nextjs-be', target: 'supabase-db' } },
-                        { data: { source: 'nextjs-be', target: 'convex' } },
-                        { data: { source: 'genkit', target: 'gemini' } },
-                        { data: { source: 'genkit', target: 'supabase-db' } },
-                        { data: { source: 'convex', target: 'supabase-db' } },
-                        { data: { source: 'casino', target: 'nextjs-be' } },
-                        { data: { source: 'nextjs-be', target: 'twilio' } },
-                        { data: { source: 'nextjs-be', target: 'sendgrid' } },
-                        { data: { source: 'nextjs-be', target: 'customerio' } }
+                        // User flow
+                        { data: { source: 'users', target: 'react', label: 'HTTP/WSS' } },
+                        { data: { source: 'react', target: 'api', label: 'GraphQL' } },
+                        
+                        // Backend flow
+                        { data: { source: 'api', target: 'langgraph', label: 'Commands' } },
+                        { data: { source: 'api', target: 'convex', label: 'Real-time' } },
+                        { data: { source: 'api', target: 'supabase', label: 'CRUD' } },
+                        
+                        // LangGraph to Agents
+                        { data: { source: 'langgraph', target: 'segment-agent', label: 'Task' } },
+                        { data: { source: 'langgraph', target: 'scenario-agent', label: 'Task' } },
+                        { data: { source: 'langgraph', target: 'content-agent', label: 'Task' } },
+                        { data: { source: 'langgraph', target: 'analytics-agent', label: 'Task' } },
+                        
+                        // Agents to DBs
+                        { data: { source: 'segment-agent', target: 'supabase', label: 'Query' } },
+                        { data: { source: 'scenario-agent', target: 'supabase', label: 'Query' } },
+                        { data: { source: 'analytics-agent', target: 'supabase', label: 'Query' } },
+                        { data: { source: 'content-agent', target: 'convex', label: 'Stream' } },
+                        
+                        // Communication flow
+                        { data: { source: 'langgraph', target: 'comm-apis', label: 'Execute' } },
+                        { data: { source: 'comm-apis', target: 'twilio', label: 'Call/SMS' } },
+                        { data: { source: 'comm-apis', target: 'sendgrid', label: 'Email' } },
+                        { data: { source: 'comm-apis', target: 'customerio', label: 'Push' } },
+                        
+                        // External data
+                        { data: { source: 'casino-api', target: 'api', label: 'Webhooks' } },
+                        { data: { source: 'payment-api', target: 'api', label: 'Callbacks' } },
+                        
+                        // Real-time updates
+                        { data: { source: 'convex', target: 'react', label: 'WebSocket' } }
                     ],
                     style: [
+                        // Базовый стиль для всех узлов
                         {
-                            selector: 'node[layer="frontend"]',
+                            selector: 'node',
                             style: {
-                                'background-color': '#f093fb',
                                 'label': 'data(label)',
-                                'color': '#fff',
                                 'text-valign': 'center',
                                 'text-halign': 'center',
-                                'width': 100,
-                                'height': 100
+                                'text-wrap': 'wrap',
+                                'text-max-width': '80px',
+                                'font-size': '12px',
+                                'border-width': 2,
+                                'color': '#fff'
                             }
                         },
+                        // Actors (Users)
                         {
-                            selector: 'node[layer="backend"]',
+                            selector: 'node[type="actor"]',
                             style: {
-                                'background-color': '#667eea',
-                                'label': 'data(label)',
-                                'color': '#fff',
-                                'text-valign': 'center',
-                                'text-halign': 'center',
-                                'width': 100,
-                                'height': 100
+                                'shape': 'ellipse',
+                                'background-color': '#2c3e50',
+                                'width': 80,
+                                'height': 80,
+                                'border-color': '#34495e'
                             }
                         },
+                        // Frontend
                         {
-                            selector: 'node[layer="external"]',
+                            selector: 'node[type="frontend"]',
                             style: {
-                                'background-color': '#4facfe',
-                                'label': 'data(label)',
-                                'color': '#fff',
-                                'text-valign': 'center',
-                                'text-halign': 'center',
-                                'width': 100,
-                                'height': 100
+                                'shape': 'round-rectangle',
+                                'background-color': '#3498db',
+                                'width': 120,
+                                'height': 60,
+                                'border-color': '#2980b9'
                             }
                         },
+                        // Gateway
+                        {
+                            selector: 'node[type="gateway"]',
+                            style: {
+                                'shape': 'diamond',
+                                'background-color': '#9b59b6',
+                                'width': 100,
+                                'height': 100,
+                                'border-color': '#8e44ad'
+                            }
+                        },
+                        // AI Core (LangGraph)
+                        {
+                            selector: 'node[type="ai-core"]',
+                            style: {
+                                'shape': 'hexagon',
+                                'background-color': '#e74c3c',
+                                'width': 140,
+                                'height': 100,
+                                'border-color': '#c0392b',
+                                'font-weight': 'bold',
+                                'font-size': '14px'
+                            }
+                        },
+                        // Databases
+                        {
+                            selector: 'node[type="database"]',
+                            style: {
+                                'shape': 'barrel',
+                                'background-color': '#16a085',
+                                'width': 100,
+                                'height': 80,
+                                'border-color': '#1abc9c'
+                            }
+                        },
+                        // AI Agents
+                        {
+                            selector: 'node[type="agent"]',
+                            style: {
+                                'shape': 'round-octagon',
+                                'background-color': '#f39c12',
+                                'width': 90,
+                                'height': 90,
+                                'border-color': '#e67e22'
+                            }
+                        },
+                        // Service Layer
+                        {
+                            selector: 'node[type="service"]',
+                            style: {
+                                'shape': 'round-rectangle',
+                                'background-color': '#27ae60',
+                                'width': 120,
+                                'height': 70,
+                                'border-color': '#229954',
+                                'border-width': 3
+                            }
+                        },
+                        // External Services
+                        {
+                            selector: 'node[type="external"]',
+                            style: {
+                                'shape': 'round-rectangle',
+                                'background-color': '#95a5a6',
+                                'width': 100,
+                                'height': 60,
+                                'border-color': '#7f8c8d',
+                                'border-style': 'dashed'
+                            }
+                        },
+                        // Edges
                         {
                             selector: 'edge',
                             style: {
                                 'width': 2,
-                                'line-color': '#764ba2',
-                                'target-arrow-color': '#764ba2',
+                                'line-color': '#7f8c8d',
+                                'target-arrow-color': '#7f8c8d',
                                 'target-arrow-shape': 'triangle',
-                                'curve-style': 'bezier'
+                                'curve-style': 'bezier',
+                                'label': 'data(label)',
+                                'font-size': '10px',
+                                'text-background-color': '#1a1a1a',
+                                'text-background-opacity': 0.8,
+                                'text-background-padding': '3px',
+                                'color': '#ecf0f1'
                             }
                         }
                     ],
                     layout: {
-                        name: 'breadthfirst',
-                        directed: true,
-                        spacingFactor: 1.5
+                        name: 'preset',
+                        positions: {
+                            // Frontend layer
+                            'users': { x: 100, y: 100 },
+                            'react': { x: 300, y: 100 },
+                            
+                            // API Gateway
+                            'api': { x: 500, y: 100 },
+                            
+                            // Core services
+                            'langgraph': { x: 700, y: 100 },
+                            'convex': { x: 500, y: 250 },
+                            'supabase': { x: 700, y: 250 },
+                            
+                            // AI Agents
+                            'segment-agent': { x: 900, y: 50 },
+                            'scenario-agent': { x: 1000, y: 150 },
+                            'content-agent': { x: 1000, y: 250 },
+                            'analytics-agent': { x: 900, y: 350 },
+                            
+                            // Communication layer
+                            'comm-apis': { x: 700, y: 400 },
+                            
+                            // External services
+                            'twilio': { x: 500, y: 500 },
+                            'sendgrid': { x: 700, y: 500 },
+                            'customerio': { x: 900, y: 500 },
+                            
+                            // External data
+                            'casino-api': { x: 300, y: 250 },
+                            'payment-api': { x: 300, y: 350 }
+                        },
+                        fit: true,
+                        padding: 50
                     }
                 });
+                
+                // Автоматически подгоняем по размеру после инициализации
+                setTimeout(() => {
+                    if (graphs.architecture) {
+                        graphs.architecture.fit();
+                        graphs.architecture.center();
+                    }
+                }, 100);
             }
 
             // Database Schema Graph
@@ -2923,7 +3090,7 @@
                         { data: { id: 'dashboard', label: 'Dashboards\n& Builders', layer: 'interface' } },
                         
                         // Orchestrator
-                        { data: { id: 'orchestrator', label: 'AI Orchestrator\n(Genkit)', layer: 'orchestrator' } },
+                        { data: { id: 'orchestrator', label: 'LangGraph\nOrchestrator', layer: 'orchestrator' } },
                         
                         // Agents
                         { data: { id: 'agent1', label: 'Segment Agent\nАнализ и\nСегментация', layer: 'agent' } },
