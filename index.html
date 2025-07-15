@@ -193,6 +193,39 @@
         .grid-3 {
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
         }
+        
+        .grid-4 {
+            grid-template-columns: repeat(4, 1fr);
+        }
+        
+        .metric-group {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .metric-group h4 {
+            margin-bottom: 1rem;
+            color: #667eea;
+            font-size: 1.1rem;
+        }
+        
+        .metric-group ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .metric-group li {
+            padding: 0.3rem 0;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .metric-group li:last-child {
+            border-bottom: none;
+        }
 
         /* Tables */
         .table-container {
@@ -406,6 +439,7 @@
             <h3>Архитектура</h3>
             <div class="nav-item" onclick="showSection('system-architecture')">Системная архитектура</div>
             <div class="nav-item" onclick="showSection('database')">Схема базы данных</div>
+            <div class="nav-item" onclick="showSection('data-flow')">Потоки данных</div>
             <div class="nav-item" onclick="showSection('ai-agents')">AI-агенты</div>
             <div class="nav-item" onclick="showSection('integrations')">Интеграции</div>
         </div>
@@ -964,10 +998,195 @@
                 <p>Структура PostgreSQL в Supabase с RLS и real-time</p>
             </div>
 
-            <div class="graph-container" id="databaseGraph">
+            <div class="graph-container" style="height: 800px;">
                 <div class="graph-controls">
                     <button onclick="resetDatabase()">Сбросить</button>
                     <button onclick="fitDatabase()">По размеру</button>
+                </div>
+                <div id="databaseGraph" style="height: calc(100% - 50px); width: 100%;"></div>
+            </div>
+            
+            <div class="card" style="margin-top: 2rem;">
+                <h3>📊 Метрики сегментации игроков</h3>
+                <div class="grid grid-4">
+                    <div class="metric-group">
+                        <h4>🎯 Базовые атрибуты</h4>
+                        <ul>
+                            <li>Coins Balance</li>
+                            <li>Customer ID</li>
+                            <li>Registration Date</li>
+                            <li>Country/Currency</li>
+                            <li>Language/Time Zone</li>
+                            <li>Age/Birthday/Gender</li>
+                            <li>Email/Phone</li>
+                            <li>Comms Preference</li>
+                        </ul>
+                    </div>
+                    <div class="metric-group">
+                        <h4>💰 RFM и монетарные</h4>
+                        <ul>
+                            <li>Recency (days)</li>
+                            <li>Frequency</li>
+                            <li>Monetary Value</li>
+                            <li>Average Order Value</li>
+                            <li>Total Revenue</li>
+                            <li>Revenue Last 30/90 Days</li>
+                            <li>Orders Last 30/90 Days</li>
+                            <li>Lifetime metrics</li>
+                        </ul>
+                    </div>
+                    <div class="metric-group">
+                        <h4>🎮 Поведенческие</h4>
+                        <ul>
+                            <li>Games Types Played</li>
+                            <li>Website Sessions</li>
+                            <li>Time on Site</li>
+                            <li>Bounce Rate</li>
+                            <li>Device/Browser Type</li>
+                            <li>Purchase Channel</li>
+                            <li>Category Preferences</li>
+                            <li>Cart Abandonment</li>
+                        </ul>
+                    </div>
+                    <div class="metric-group">
+                        <h4>🤖 AI предикты</h4>
+                        <ul>
+                            <li>Churn Probability</li>
+                            <li>Predicted LTV</li>
+                            <li>Propensity to Buy</li>
+                            <li>Upsell/Cross-sell Score</li>
+                            <li>Retention Probability</li>
+                            <li>Engagement Score</li>
+                            <li>Loyalty Score</li>
+                            <li>Conversion Score</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="grid grid-4" style="margin-top: 2rem;">
+                    <div class="metric-group">
+                        <h4>📧 Коммуникации</h4>
+                        <ul>
+                            <li>Email Open Rate</li>
+                            <li>Email Click Rate</li>
+                            <li>SMS Response Rate</li>
+                            <li>Phone Call Answer Rate</li>
+                            <li>Push Response Rate</li>
+                            <li>Channel Preference</li>
+                            <li>Campaign Response History</li>
+                            <li>Total Campaign Responses</li>
+                        </ul>
+                    </div>
+                    <div class="metric-group">
+                        <h4>🔄 Жизненный цикл</h4>
+                        <ul>
+                            <li>Customer Lifecycle Stage</li>
+                            <li>Tenure (days)</li>
+                            <li>Activation Status</li>
+                            <li>Onboarding Status</li>
+                            <li>VIP Status</li>
+                            <li>Loyalty Program Status</li>
+                            <li>Subscription Status</li>
+                            <li>Retention Stage</li>
+                        </ul>
+                    </div>
+                    <div class="metric-group">
+                        <h4>🔒 Продуктовые</h4>
+                        <ul>
+                            <li>Product Categories Purchased</li>
+                            <li>Discount Usage</li>
+                            <li>Promo Code Usage</li>
+                            <li>Return History</li>
+                            <li>Refund History</li>
+                            <li>Product Ratings Given</li>
+                            <li>Reviews Written</li>
+                            <li>Loyalty Points</li>
+                        </ul>
+                    </div>
+                    <div class="metric-group">
+                        <h4>⏰ Временные паттерны</h4>
+                        <ul>
+                            <li>Day of Week Preference</li>
+                            <li>Time of Day Preference</li>
+                            <li>Seasonal Patterns</li>
+                            <li>Holiday Behavior</li>
+                            <li>Weekend vs Weekday</li>
+                            <li>Peak Activity Hours</li>
+                            <li>Session Duration Patterns</li>
+                            <li>Purchase Time Patterns</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-top: 2rem; background: rgba(102, 126, 234, 0.1); border-color: #667eea;">
+                    <h4>📝 Пример сегментации</h4>
+                    <p>Все эти метрики хранятся в специальных таблицах PostgreSQL и автоматически вычисляются через ETL пайплайны и AI-агенты. Например:</p>
+                    <pre style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px;"><code>SELECT p.*, 
+       pm.recency_days,
+       pm.frequency_30d,
+       pm.monetary_lifetime,
+       pp.churn_probability,
+       pp.predicted_ltv
+FROM players p
+JOIN player_metrics pm ON p.id = pm.player_id  
+JOIN player_predictions pp ON p.id = pp.player_id
+WHERE pm.recency_days < 7 
+  AND pp.churn_probability > 0.7
+  AND pm.monetary_lifetime > 1000;</code></pre>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Data Flow Section -->
+        <section class="section" id="data-flow">
+            <div class="section-header">
+                <h2>Потоки данных и интеграции</h2>
+                <p>Как данные из различных источников попадают в систему и обрабатываются</p>
+            </div>
+            <div class="graph-container" style="height: 700px;">
+                <div class="graph-controls">
+                    <button onclick="resetDataFlow()">Сбросить</button>
+                    <button onclick="fitDataFlow()">По размеру</button>
+                </div>
+                <div id="dataFlowGraph" style="height: calc(100% - 50px); width: 100%;"></div>
+            </div>
+            
+            <div class="card" style="margin-top: 2rem;">
+                <h3>🔄 Источники данных и ETL процессы</h3>
+                <div class="grid grid-3">
+                    <div class="feature-card">
+                        <h4>🎰 Casino Platform APIs</h4>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Player Registration Events</li>
+                            <li>• Game Sessions & Results</li>
+                            <li>• Deposits & Withdrawals</li>
+                            <li>• Bonus Activations</li>
+                            <li>• Game Preferences</li>
+                            <li>• VIP Status Changes</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>📊 Analytics & Tracking</h4>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Google Analytics 4</li>
+                            <li>• Mixpanel Events</li>
+                            <li>• Hotjar Sessions</li>
+                            <li>• Custom Event Tracking</li>
+                            <li>• Attribution Data</li>
+                            <li>• A/B Test Results</li>
+                        </ul>
+                    </div>
+                    <div class="feature-card">
+                        <h4>💳 Payment Providers</h4>
+                        <ul style="list-style: none; padding: 0; margin-top: 1rem;">
+                            <li>• Transaction History</li>
+                            <li>• Payment Methods</li>
+                            <li>• Fraud Signals</li>
+                            <li>• Chargebacks</li>
+                            <li>• Limits & Restrictions</li>
+                            <li>• KYC Status</li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2966,43 +3185,122 @@
                 }, 100);
             }
 
-            // Database Schema Graph - PostgreSQL style
+            // Database Schema Graph - Enhanced PostgreSQL style with all metrics
             const databaseContainer = document.getElementById('databaseGraph');
             if (databaseContainer) {
-                databaseContainer.style.minHeight = '600px';
-                
                 graphs.database = cytoscape({
                     container: databaseContainer,
                     elements: [
-                        // Core Tables
-                        { data: { id: 'players', label: 'players\n\nid: uuid PK\ncasino_id: text\nemail: text\nphone: text\nfirst_name: text\nlast_name: text\nregistered_at: timestamp\nlast_active: timestamp\nlifetime_value: numeric\nrisk_score: float\npreferred_games: jsonb\nmetadata: jsonb', type: 'table' } },
+                        // Core Tables with enhanced fields
+                        { data: { 
+                            id: 'players', 
+                            label: 'players', 
+                            fullLabel: 'PLAYERS\n━━━━━━━━━━━━━━━━━━━━━\nBasic Info:\n• id, casino_id, email, phone\n• first_name, last_name\n• age, birthday, gender\n• country, currency, language\n• time_zone, registration_date\n\nEngagement:\n• last_active, last_login_date\n• session_count, total_time_played\n• preferred_games[]\n• device_types[]\n\nFinancial:\n• coins_balance\n• lifetime_value, total_deposits\n• total_withdrawals\n• average_bet_size\n\nScores & Status:\n• risk_score, vip_status\n• loyalty_tier, verification_status\n• communication_preferences{}',
+                            type: 'table', 
+                            category: 'core' 
+                        }},
                         
-                        { data: { id: 'player_events', label: 'player_events\n\nid: uuid PK\nplayer_id: uuid FK\nevent_type: text\nevent_data: jsonb\namount: numeric\ngame_id: text\nsession_id: text\ncreated_at: timestamp', type: 'table' } },
+                        { data: { 
+                            id: 'player_metrics', 
+                            label: 'player_metrics',
+                            fullLabel: 'PLAYER_METRICS\n━━━━━━━━━━━━━━━━━━━━━\nRFM Metrics:\n• recency_days\n• frequency_30d, frequency_90d\n• monetary_30d, monetary_90d\n• monetary_lifetime\n\nRevenue Metrics:\n• revenue_last_24h, last_7d\n• revenue_last_30d, last_90d\n• average_order_value\n• total_orders\n\nEngagement Metrics:\n• sessions_last_30d\n• avg_session_duration\n• pages_per_session\n• bounce_rate\n\nGame Metrics:\n• games_played_count\n• favorite_game_type\n• win_rate, rtp_personal',
+                            type: 'table',
+                            category: 'metrics'
+                        }},
                         
-                        { data: { id: 'segments', label: 'segments\n\nid: uuid PK\nname: text\ndescription: text\ntype: enum\nfilters: jsonb\nis_dynamic: boolean\nplayer_count: integer\ncreated_by: uuid\ncreated_at: timestamp', type: 'table' } },
+                        { data: { 
+                            id: 'player_predictions', 
+                            label: 'player_predictions',
+                            fullLabel: 'PLAYER_PREDICTIONS\n━━━━━━━━━━━━━━━━━━━━━\nAI Scores:\n• churn_probability\n• predicted_ltv\n• conversion_probability\n• next_deposit_prediction\n\nPropensity Scores:\n• propensity_to_buy\n• upsell_propensity\n• cross_sell_propensity\n• bonus_activation_prob\n\nBehavioral Scores:\n• engagement_score\n• loyalty_score\n• risk_score\n• fraud_probability\n\nUpdated:\n• last_calculated\n• model_version',
+                            type: 'table',
+                            category: 'ai'
+                        }},
                         
-                        { data: { id: 'player_segments', label: 'player_segments\n\nplayer_id: uuid FK\nsegment_id: uuid FK\nadded_at: timestamp\nremoved_at: timestamp\nscore: float', type: 'junction' } },
+                        { data: { 
+                            id: 'player_events', 
+                            label: 'player_events',
+                            fullLabel: 'PLAYER_EVENTS\n━━━━━━━━━━━━━━━━━━━━━\nEvent Data:\n• id, player_id\n• event_type, event_name\n• event_data{}\n• amount, currency\n\nContext:\n• game_id, round_id\n• session_id\n• device_info{}\n• location_data{}\n\nTimestamps:\n• created_at\n• processed_at',
+                            type: 'table',
+                            category: 'events'
+                        }},
                         
-                        { data: { id: 'campaigns', label: 'campaigns\n\nid: uuid PK\nname: text\nstatus: enum\ntype: text\nstart_date: timestamp\nend_date: timestamp\nbudget: numeric\nroi_target: float\nmetadata: jsonb', type: 'table' } },
+                        { data: { 
+                            id: 'segments', 
+                            label: 'segments',
+                            fullLabel: 'SEGMENTS\n━━━━━━━━━━━━━━━━━━━━━\nDefinition:\n• id, name, description\n• type (static/dynamic)\n• filters{}, conditions[]\n• priority, is_active\n\nMetrics:\n• player_count\n• avg_ltv\n• conversion_rate\n\nMeta:\n• created_by\n• created_at\n• last_updated',
+                            type: 'table',
+                            category: 'core'
+                        }},
                         
-                        { data: { id: 'scenarios', label: 'scenarios\n\nid: uuid PK\ncampaign_id: uuid FK\nname: text\ntrigger_type: enum\nflow_graph: jsonb\nbonus_rules: jsonb\nis_active: boolean\nversion: integer', type: 'table' } },
+                        { data: { 
+                            id: 'player_segments', 
+                            label: 'player_segments',
+                            fullLabel: 'PLAYER_SEGMENTS\n━━━━━━━━━━━━━━━━━━━━━\nMapping:\n• player_id\n• segment_id\n• match_score\n• match_reason\n\nLifecycle:\n• added_at\n• removed_at\n• last_checked',
+                            type: 'junction',
+                            category: 'mapping'
+                        }},
                         
-                        { data: { id: 'bonuses', label: 'bonuses\n\nid: uuid PK\nplayer_id: uuid FK\nscenario_id: uuid FK\ntype: enum\namount: numeric\nwager_requirement: float\nexpires_at: timestamp\nactivated_at: timestamp\nstatus: enum', type: 'table' } },
+                        { data: { 
+                            id: 'campaigns', 
+                            label: 'campaigns',
+                            fullLabel: 'CAMPAIGNS\n━━━━━━━━━━━━━━━━━━━━━\nBasics:\n• id, name, description\n• type, status\n• target_segments[]\n\nSchedule:\n• start_date, end_date\n• timezone\n• recurrence_rule\n\nBudget & Goals:\n• budget_total\n• budget_spent\n• roi_target\n• conversion_goal\n\nResults:\n• players_reached\n• conversions\n• revenue_generated',
+                            type: 'table',
+                            category: 'marketing'
+                        }},
                         
-                        { data: { id: 'communications', label: 'communications\n\nid: uuid PK\nplayer_id: uuid FK\nscenario_id: uuid FK\nchannel: enum\ntemplate_id: text\ncontent: jsonb\nstatus: enum\nsent_at: timestamp\nopened_at: timestamp\nclicked_at: timestamp', type: 'table' } },
+                        { data: { 
+                            id: 'scenarios', 
+                            label: 'scenarios',
+                            fullLabel: 'SCENARIOS\n━━━━━━━━━━━━━━━━━━━━━\nDefinition:\n• id, campaign_id\n• name, description\n• trigger_type\n• trigger_conditions{}\n\nFlow:\n• flow_graph{}\n• steps[]\n• branches[]\n\nRules:\n• bonus_rules{}\n• timing_rules{}\n• channel_rules{}\n\nMeta:\n• version\n• is_active\n• ab_test_variant',
+                            type: 'table',
+                            category: 'marketing'
+                        }},
                         
-                        { data: { id: 'analytics', label: 'analytics_metrics\n\nid: uuid PK\nmetric_type: text\nperiod: tsrange\nsegment_id: uuid FK\nvalue: numeric\ndetails: jsonb\ncalculated_at: timestamp', type: 'table' } },
+                        { data: { 
+                            id: 'bonuses', 
+                            label: 'bonuses',
+                            fullLabel: 'BONUSES\n━━━━━━━━━━━━━━━━━━━━━\nBasics:\n• id, player_id\n• scenario_id\n• type, code\n\nValue:\n• amount\n• currency\n• wager_requirement\n• max_win_amount\n\nStatus:\n• status\n• issued_at\n• activated_at\n• expires_at\n• completed_at\n\nUsage:\n• wagered_amount\n• remaining_wager\n• games_allowed[]',
+                            type: 'table',
+                            category: 'marketing'
+                        }},
+                        
+                        { data: { 
+                            id: 'communications', 
+                            label: 'communications',
+                            fullLabel: 'COMMUNICATIONS\n━━━━━━━━━━━━━━━━━━━━━\nBasics:\n• id, player_id\n• scenario_id\n• channel\n• template_id\n\nContent:\n• subject\n• content{}\n• personalization{}\n• attachments[]\n\nDelivery:\n• status\n• sent_at\n• delivered_at\n• opened_at\n• clicked_at\n\nResponse:\n• click_count\n• conversion_value',
+                            type: 'table',
+                            category: 'marketing'
+                        }},
+                        
+                        { data: { 
+                            id: 'player_timeline', 
+                            label: 'player_timeline',
+                            fullLabel: 'PLAYER_TIMELINE\n━━━━━━━━━━━━━━━━━━━━━\nActivity Log:\n• player_id\n• timestamp\n• activity_type\n• activity_details{}\n• channel\n• session_id\n\nTypes:\n• game_play\n• deposit/withdrawal\n• bonus_activation\n• support_contact\n• preference_change',
+                            type: 'table',
+                            category: 'events'
+                        }},
+                        
+                        { data: { 
+                            id: 'analytics_cache', 
+                            label: 'analytics_cache',
+                            fullLabel: 'ANALYTICS_CACHE\n━━━━━━━━━━━━━━━━━━━━━\nMetrics:\n• metric_type\n• segment_id\n• time_period\n• value\n• details{}\n\nMeta:\n• calculated_at\n• expires_at\n• calculation_time_ms',
+                            type: 'table',
+                            category: 'analytics'
+                        }},
                         
                         // Relations
-                        { data: { source: 'player_events', target: 'players', label: 'REFERENCES' } },
-                        { data: { source: 'player_segments', target: 'players', label: 'REFERENCES' } },
-                        { data: { source: 'player_segments', target: 'segments', label: 'REFERENCES' } },
-                        { data: { source: 'scenarios', target: 'campaigns', label: 'BELONGS TO' } },
+                        { data: { source: 'player_metrics', target: 'players', label: 'CALCULATES' } },
+                        { data: { source: 'player_predictions', target: 'players', label: 'PREDICTS' } },
+                        { data: { source: 'player_events', target: 'players', label: 'BELONGS TO' } },
+                        { data: { source: 'player_segments', target: 'players', label: 'MAPS' } },
+                        { data: { source: 'player_segments', target: 'segments', label: 'MAPS' } },
+                        { data: { source: 'scenarios', target: 'campaigns', label: 'PART OF' } },
                         { data: { source: 'bonuses', target: 'players', label: 'ISSUED TO' } },
-                        { data: { source: 'bonuses', target: 'scenarios', label: 'FROM' } },
+                        { data: { source: 'bonuses', target: 'scenarios', label: 'TRIGGERED BY' } },
                         { data: { source: 'communications', target: 'players', label: 'SENT TO' } },
-                        { data: { source: 'communications', target: 'scenarios', label: 'TRIGGERED BY' } },
-                        { data: { source: 'analytics', target: 'segments', label: 'TRACKS' } }
+                        { data: { source: 'communications', target: 'scenarios', label: 'PART OF' } },
+                        { data: { source: 'player_timeline', target: 'players', label: 'TRACKS' } },
+                        { data: { source: 'analytics_cache', target: 'segments', label: 'ANALYZES' } }
                     ],
                     style: [
                         // Base node style
@@ -3010,39 +3308,98 @@
                             selector: 'node',
                             style: {
                                 'label': 'data(label)',
-                                'text-valign': 'top',
+                                'text-valign': 'center',
                                 'text-halign': 'center',
-                                'text-margin-y': 10,
                                 'text-wrap': 'wrap',
-                                'text-max-width': 200,
-                                'font-size': 10,
+                                'text-max-width': 120,
+                                'font-size': 13,
                                 'font-family': 'monospace',
+                                'font-weight': 'bold',
                                 'line-height': 1.4,
                                 'color': '#fff',
-                                'width': 'label',
-                                'height': 'label',
-                                'padding': 20
+                                'width': 140,
+                                'height': 70,
+                                'padding': 10
                             }
                         },
-                        // Main tables
+                        // Core tables - larger size
                         {
-                            selector: 'node[type="table"]',
+                            selector: 'node[category="core"]',
                             style: {
                                 'shape': 'round-rectangle',
                                 'background-color': '#2c3e50',
                                 'border-width': 3,
-                                'border-color': '#34495e'
+                                'border-color': '#34495e',
+                                'width': 180,
+                                'height': 90,
+                                'font-size': 14
                             }
                         },
-                        // Junction tables
+                        // Metrics tables
                         {
-                            selector: 'node[type="junction"]',
+                            selector: 'node[category="metrics"]',
+                            style: {
+                                'shape': 'hexagon',
+                                'background-color': '#e74c3c',
+                                'border-width': 2,
+                                'border-color': '#c0392b'
+                            }
+                        },
+                        // AI tables
+                        {
+                            selector: 'node[category="ai"]',
+                            style: {
+                                'shape': 'star',
+                                'background-color': '#9b59b6',
+                                'border-width': 3,
+                                'border-color': '#8e44ad',
+                                'width': 160,
+                                'height': 160
+                            }
+                        },
+                        // Marketing tables
+                        {
+                            selector: 'node[category="marketing"]',
+                            style: {
+                                'shape': 'round-octagon',
+                                'background-color': '#3498db',
+                                'border-width': 2,
+                                'border-color': '#2980b9'
+                            }
+                        },
+                        // Events tables
+                        {
+                            selector: 'node[category="events"]',
+                            style: {
+                                'shape': 'vee',
+                                'background-color': '#f39c12',
+                                'border-width': 2,
+                                'border-color': '#d68910'
+                            }
+                        },
+                        // Analytics tables
+                        {
+                            selector: 'node[category="analytics"]',
+                            style: {
+                                'shape': 'diamond',
+                                'background-color': '#27ae60',
+                                'border-width': 2,
+                                'border-color': '#229954',
+                                'width': 150,
+                                'height': 150
+                            }
+                        },
+                        // Junction/mapping tables
+                        {
+                            selector: 'node[category="mapping"]',
                             style: {
                                 'shape': 'cut-rectangle',
-                                'background-color': '#8e44ad',
+                                'background-color': '#95a5a6',
                                 'border-width': 2,
-                                'border-color': '#9b59b6',
-                                'border-style': 'dashed'
+                                'border-color': '#7f8c8d',
+                                'border-style': 'dashed',
+                                'width': 120,
+                                'height': 60
                             }
                         },
                         // Foreign key relationships
@@ -3066,17 +3423,60 @@
                         }
                     ],
                     layout: {
-                        name: 'cose',
-                        nodeRepulsion: 10000,
-                        idealEdgeLength: 150,
-                        edgeElasticity: 200,
-                        nestingFactor: 5,
-                        gravity: 80,
-                        numIter: 1000,
-                        initialTemp: 300,
-                        coolingFactor: 0.95,
-                        minTemp: 1.0,
-                        componentSpacing: 100
+                        name: 'dagre',
+                        rankDir: 'TB',
+                        rankSep: 120,
+                        nodeSep: 80,
+                        edgeSep: 50,
+                        padding: 50,
+                        animate: true,
+                        animationDuration: 500,
+                        fit: true
+                    }
+                });
+                
+                // Add interactivity - show full table details on click
+                graphs.database.on('tap', 'node', function(evt){
+                    const node = evt.target;
+                    const fullLabel = node.data('fullLabel');
+                    if (fullLabel) {
+                        // Create tooltip div if it doesn't exist
+                        let tooltip = document.getElementById('db-tooltip');
+                        if (!tooltip) {
+                            tooltip = document.createElement('div');
+                            tooltip.id = 'db-tooltip';
+                            tooltip.style.cssText = `
+                                position: absolute;
+                                background: rgba(0, 0, 0, 0.95);
+                                border: 2px solid #667eea;
+                                border-radius: 8px;
+                                padding: 1.5rem;
+                                color: #fff;
+                                font-family: monospace;
+                                font-size: 12px;
+                                max-width: 400px;
+                                z-index: 10000;
+                                white-space: pre-line;
+                                box-shadow: 0 4px 20px rgba(102, 126, 234, 0.4);
+                            `;
+                            document.body.appendChild(tooltip);
+                        }
+                        
+                        // Position tooltip near the clicked node
+                        const pos = evt.renderedPosition || evt.position;
+                        tooltip.innerHTML = fullLabel.replace(/•/g, '<span style="color: #667eea;">•</span>');
+                        tooltip.style.display = 'block';
+                        tooltip.style.left = (pos.x + 20) + 'px';
+                        tooltip.style.top = (pos.y - 20) + 'px';
+                        
+                        // Hide tooltip when clicking elsewhere
+                        const hideTooltip = () => {
+                            tooltip.style.display = 'none';
+                            document.removeEventListener('click', hideTooltip);
+                        };
+                        setTimeout(() => {
+                            document.addEventListener('click', hideTooltip);
+                        }, 100);
                     }
                 });
                 
@@ -3085,6 +3485,224 @@
                     if (graphs.database) {
                         graphs.database.fit();
                         graphs.database.center();
+                    }
+                }, 100);
+            }
+            
+            // Data Flow Graph - Integration and ETL processes
+            const dataFlowContainer = document.getElementById('dataFlowGraph');
+            if (dataFlowContainer) {
+                graphs.dataFlow = cytoscape({
+                    container: dataFlowContainer,
+                    elements: [
+                        // External Sources
+                        { data: { id: 'casino_api', label: 'Casino\nPlatform API', type: 'source', category: 'external' } },
+                        { data: { id: 'payment_api', label: 'Payment\nProviders', type: 'source', category: 'external' } },
+                        { data: { id: 'analytics_api', label: 'Analytics\nPlatforms', type: 'source', category: 'external' } },
+                        { data: { id: 'game_providers', label: 'Game\nProviders', type: 'source', category: 'external' } },
+                        { data: { id: 'kyc_providers', label: 'KYC/AML\nProviders', type: 'source', category: 'external' } },
+                        
+                        // ETL Processors
+                        { data: { id: 'webhook_receiver', label: 'Webhook\nReceiver', type: 'processor', category: 'etl' } },
+                        { data: { id: 'event_processor', label: 'Event\nProcessor', type: 'processor', category: 'etl' } },
+                        { data: { id: 'data_transformer', label: 'Data\nTransformer', type: 'processor', category: 'etl' } },
+                        { data: { id: 'validator', label: 'Data\nValidator', type: 'processor', category: 'etl' } },
+                        { data: { id: 'enricher', label: 'Data\nEnricher', type: 'processor', category: 'etl' } },
+                        
+                        // Real-time Streams
+                        { data: { id: 'convex_realtime', label: 'Convex\nReal-time', type: 'stream', category: 'realtime' } },
+                        { data: { id: 'event_stream', label: 'Event\nStream', type: 'stream', category: 'realtime' } },
+                        
+                        // Data Storage
+                        { data: { id: 'supabase_db', label: 'Supabase\nPostgreSQL', type: 'storage', category: 'database' } },
+                        { data: { id: 'redis_cache', label: 'Redis\nCache', type: 'storage', category: 'cache' } },
+                        { data: { id: 'vector_store', label: 'Vector\nStore', type: 'storage', category: 'ai' } },
+                        
+                        // AI Processing
+                        { data: { id: 'ml_pipeline', label: 'ML\nPipeline', type: 'ai', category: 'processing' } },
+                        { data: { id: 'prediction_engine', label: 'Prediction\nEngine', type: 'ai', category: 'processing' } },
+                        { data: { id: 'segmentation_engine', label: 'Segmentation\nEngine', type: 'ai', category: 'processing' } },
+                        
+                        // Application Layer
+                        { data: { id: 'api_gateway', label: 'API\nGateway', type: 'app', category: 'application' } },
+                        { data: { id: 'business_logic', label: 'Business\nLogic', type: 'app', category: 'application' } },
+                        { data: { id: 'ui_dashboard', label: 'Dashboard\nUI', type: 'app', category: 'application' } },
+                        
+                        // Data Flows
+                        // From sources to processors
+                        { data: { source: 'casino_api', target: 'webhook_receiver', label: 'Events' } },
+                        { data: { source: 'payment_api', target: 'webhook_receiver', label: 'Transactions' } },
+                        { data: { source: 'analytics_api', target: 'event_processor', label: 'Metrics' } },
+                        { data: { source: 'game_providers', target: 'event_processor', label: 'Game Data' } },
+                        { data: { source: 'kyc_providers', target: 'validator', label: 'KYC Data' } },
+                        
+                        // Processing flow
+                        { data: { source: 'webhook_receiver', target: 'event_processor' } },
+                        { data: { source: 'event_processor', target: 'data_transformer' } },
+                        { data: { source: 'data_transformer', target: 'validator' } },
+                        { data: { source: 'validator', target: 'enricher' } },
+                        
+                        // To real-time
+                        { data: { source: 'enricher', target: 'convex_realtime' } },
+                        { data: { source: 'enricher', target: 'event_stream' } },
+                        
+                        // To storage
+                        { data: { source: 'convex_realtime', target: 'supabase_db' } },
+                        { data: { source: 'event_stream', target: 'redis_cache' } },
+                        { data: { source: 'enricher', target: 'supabase_db', label: 'Batch' } },
+                        
+                        // AI processing
+                        { data: { source: 'supabase_db', target: 'ml_pipeline' } },
+                        { data: { source: 'ml_pipeline', target: 'prediction_engine' } },
+                        { data: { source: 'ml_pipeline', target: 'segmentation_engine' } },
+                        { data: { source: 'prediction_engine', target: 'vector_store' } },
+                        { data: { source: 'segmentation_engine', target: 'supabase_db', label: 'Results' } },
+                        
+                        // Application access
+                        { data: { source: 'supabase_db', target: 'api_gateway' } },
+                        { data: { source: 'redis_cache', target: 'api_gateway' } },
+                        { data: { source: 'vector_store', target: 'api_gateway' } },
+                        { data: { source: 'api_gateway', target: 'business_logic' } },
+                        { data: { source: 'business_logic', target: 'ui_dashboard' } },
+                        { data: { source: 'convex_realtime', target: 'ui_dashboard', label: 'WebSocket' } }
+                    ],
+                    style: [
+                        // Base style
+                        {
+                            selector: 'node',
+                            style: {
+                                'label': 'data(label)',
+                                'text-valign': 'center',
+                                'text-halign': 'center',
+                                'text-wrap': 'wrap',
+                                'text-max-width': '80px',
+                                'font-size': '11px',
+                                'color': '#fff',
+                                'width': 100,
+                                'height': 80
+                            }
+                        },
+                        // External sources
+                        {
+                            selector: 'node[category="external"]',
+                            style: {
+                                'shape': 'round-rectangle',
+                                'background-color': '#e74c3c',
+                                'border-width': 3,
+                                'border-color': '#c0392b',
+                                'border-style': 'dashed'
+                            }
+                        },
+                        // ETL processors
+                        {
+                            selector: 'node[category="etl"]',
+                            style: {
+                                'shape': 'hexagon',
+                                'background-color': '#f39c12',
+                                'border-width': 2,
+                                'border-color': '#d68910'
+                            }
+                        },
+                        // Real-time streams
+                        {
+                            selector: 'node[category="realtime"]',
+                            style: {
+                                'shape': 'round-octagon',
+                                'background-color': '#9b59b6',
+                                'border-width': 3,
+                                'border-color': '#8e44ad',
+                                'width': 120,
+                                'height': 100
+                            }
+                        },
+                        // Databases
+                        {
+                            selector: 'node[category="database"]',
+                            style: {
+                                'shape': 'barrel',
+                                'background-color': '#16a085',
+                                'border-width': 3,
+                                'border-color': '#1abc9c',
+                                'width': 120,
+                                'height': 100
+                            }
+                        },
+                        // Cache
+                        {
+                            selector: 'node[category="cache"]',
+                            style: {
+                                'shape': 'round-diamond',
+                                'background-color': '#27ae60',
+                                'border-width': 2,
+                                'border-color': '#229954'
+                            }
+                        },
+                        // AI nodes
+                        {
+                            selector: 'node[category="ai"]',
+                            style: {
+                                'shape': 'star',
+                                'background-color': '#8e44ad',
+                                'border-width': 2,
+                                'border-color': '#9b59b6'
+                            }
+                        },
+                        // Processing nodes
+                        {
+                            selector: 'node[category="processing"]',
+                            style: {
+                                'shape': 'vee',
+                                'background-color': '#e67e22',
+                                'border-width': 2,
+                                'border-color': '#d35400'
+                            }
+                        },
+                        // Application layer
+                        {
+                            selector: 'node[category="application"]',
+                            style: {
+                                'shape': 'round-rectangle',
+                                'background-color': '#3498db',
+                                'border-width': 2,
+                                'border-color': '#2980b9'
+                            }
+                        },
+                        // Edges
+                        {
+                            selector: 'edge',
+                            style: {
+                                'width': 2,
+                                'line-color': '#7f8c8d',
+                                'target-arrow-color': '#7f8c8d',
+                                'target-arrow-shape': 'triangle',
+                                'curve-style': 'bezier',
+                                'label': 'data(label)',
+                                'font-size': 9,
+                                'text-background-color': '#1a1a1a',
+                                'text-background-opacity': 0.8,
+                                'text-background-padding': '2px',
+                                'color': '#bdc3c7'
+                            }
+                        }
+                    ],
+                    layout: {
+                        name: 'dagre',
+                        rankDir: 'LR',
+                        rankSep: 150,
+                        nodeSep: 60,
+                        edgeSep: 30,
+                        padding: 30,
+                        animate: true,
+                        animationDuration: 500,
+                        fit: true
+                    }
+                });
+                
+                // Auto fit on creation
+                setTimeout(() => {
+                    if (graphs.dataFlow) {
+                        graphs.dataFlow.fit();
+                        graphs.dataFlow.center();
                     }
                 }, 100);
             }
@@ -3577,6 +4195,19 @@
         function fitDatabase() {
             if (graphs.database) {
                 graphs.database.fit();
+            }
+        }
+        
+        function resetDataFlow() {
+            if (graphs.dataFlow) {
+                graphs.dataFlow.reset();
+                graphs.dataFlow.center();
+            }
+        }
+        
+        function fitDataFlow() {
+            if (graphs.dataFlow) {
+                graphs.dataFlow.fit();
             }
         }
 
