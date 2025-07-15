@@ -961,7 +961,7 @@
         <section class="section" id="database">
             <div class="section-header">
                 <h2>Схема базы данных</h2>
-                <p>Структура хранения данных в Firestore</p>
+                <p>Структура PostgreSQL в Supabase с RLS и real-time</p>
             </div>
 
             <div class="graph-container" id="databaseGraph">
@@ -2543,65 +2543,60 @@
                 graphs.modules = cytoscape({
                     container: modulesContainer,
                     elements: [
-                        // Main Modules
-                        { data: { id: 'command', label: 'Command Center', type: 'module' } },
-                        { data: { id: 'player', label: 'Player 360°', type: 'module' } },
-                        { data: { id: 'segment', label: 'Segment Builder', type: 'module' } },
-                        { data: { id: 'scenario', label: 'Scenario Builder', type: 'module' } },
-                        { data: { id: 'analytics', label: 'Analytics', type: 'module' } },
-                        { data: { id: 'settings', label: 'Settings', type: 'module' } },
+                        // Frontend Modules
+                        { data: { id: 'dashboard', label: 'Dashboard\nOverview', type: 'module' } },
+                        { data: { id: 'players', label: 'Players\nManagement', type: 'module' } },
+                        { data: { id: 'segments', label: 'Segment\nBuilder', type: 'module' } },
+                        { data: { id: 'campaigns', label: 'Campaign\nManager', type: 'module' } },
+                        { data: { id: 'scenarios', label: 'Scenario\nDesigner', type: 'module' } },
+                        { data: { id: 'analytics', label: 'Analytics\n& Reports', type: 'module' } },
+                        { data: { id: 'settings', label: 'Settings\n& Config', type: 'module' } },
                         
-                        // AI Core and Sub-agents
-                        { data: { id: 'ai', label: 'AI Core\n(LangGraph)', type: 'ai-core' } },
-                        { data: { id: 'agent-segment', label: 'Segment Agent\ngenerate-segments.ts', type: 'agent' } },
-                        { data: { id: 'agent-scenario', label: 'Scenario Agent\ngenerate-scenario.ts', type: 'agent' } },
-                        { data: { id: 'agent-content', label: 'Content Agent\ngenerate-content.ts', type: 'agent' } },
-                        { data: { id: 'agent-insights', label: 'Insights Agent\nexplain-metrics.ts', type: 'agent' } },
-                        { data: { id: 'agent-risk', label: 'Risk Agent\nrisk-assessment.ts', type: 'agent' } },
-                        { data: { id: 'agent-optimization', label: 'Optimization Agent\noptimize-campaigns.ts', type: 'agent' } },
+                        // Core Services
+                        { data: { id: 'api', label: 'API Gateway', type: 'service' } },
+                        { data: { id: 'langgraph', label: 'LangGraph\nCore', type: 'ai-core' } },
+                        { data: { id: 'realtime', label: 'Convex\nReal-time', type: 'service' } },
+                        { data: { id: 'auth', label: 'Auth\nService', type: 'service' } },
                         
-                        // Tools for agents
-                        { data: { id: 'tool-db', label: 'Firestore\nQueries', type: 'tool' } },
-                        { data: { id: 'tool-analytics', label: 'Analytics\nEngine', type: 'tool' } },
-                        { data: { id: 'tool-nlp', label: 'NLP\nParser', type: 'tool' } },
-                        { data: { id: 'tool-prediction', label: 'Prediction\nModels', type: 'tool' } },
-                        { data: { id: 'tool-template', label: 'Template\nEngine', type: 'tool' } },
-                        { data: { id: 'tool-ab', label: 'A/B Test\nFramework', type: 'tool' } },
+                        // Data Layer
+                        { data: { id: 'supabase', label: 'Supabase\nPostgreSQL', type: 'database' } },
+                        { data: { id: 'convex-db', label: 'Convex DB\nSync', type: 'database' } },
+                        { data: { id: 'redis', label: 'Redis\nCache', type: 'database' } },
                         
-                        // Edges - Module connections
-                        { data: { source: 'ai', target: 'command', type: 'provides' } },
-                        { data: { source: 'ai', target: 'segment', type: 'provides' } },
-                        { data: { source: 'ai', target: 'scenario', type: 'provides' } },
-                        { data: { source: 'player', target: 'segment', type: 'data' } },
-                        { data: { source: 'segment', target: 'scenario', type: 'data' } },
-                        { data: { source: 'scenario', target: 'analytics', type: 'data' } },
-                        { data: { source: 'command', target: 'analytics', type: 'data' } },
+                        // External Integrations
+                        { data: { id: 'casino-apis', label: 'Casino\nAPIs', type: 'external' } },
+                        { data: { id: 'payment', label: 'Payment\nProviders', type: 'external' } },
+                        { data: { id: 'comm-apis', label: 'Communication\nAPIs', type: 'external' } },
                         
-                        // AI Core to Agents
-                        { data: { source: 'ai', target: 'agent-segment', type: 'orchestrates' } },
-                        { data: { source: 'ai', target: 'agent-scenario', type: 'orchestrates' } },
-                        { data: { source: 'ai', target: 'agent-content', type: 'orchestrates' } },
-                        { data: { source: 'ai', target: 'agent-insights', type: 'orchestrates' } },
-                        { data: { source: 'ai', target: 'agent-risk', type: 'orchestrates' } },
-                        { data: { source: 'ai', target: 'agent-optimization', type: 'orchestrates' } },
+                        // Frontend to API connections
+                        { data: { source: 'dashboard', target: 'api', label: 'REST/GraphQL' } },
+                        { data: { source: 'players', target: 'api', label: 'REST/GraphQL' } },
+                        { data: { source: 'segments', target: 'api', label: 'REST/GraphQL' } },
+                        { data: { source: 'campaigns', target: 'api', label: 'REST/GraphQL' } },
+                        { data: { source: 'scenarios', target: 'api', label: 'REST/GraphQL' } },
+                        { data: { source: 'analytics', target: 'api', label: 'REST/GraphQL' } },
+                        { data: { source: 'settings', target: 'api', label: 'REST/GraphQL' } },
                         
-                        // Agents to Tools
-                        { data: { source: 'agent-segment', target: 'tool-db', type: 'uses' } },
-                        { data: { source: 'agent-segment', target: 'tool-nlp', type: 'uses' } },
-                        { data: { source: 'agent-scenario', target: 'tool-template', type: 'uses' } },
-                        { data: { source: 'agent-content', target: 'tool-template', type: 'uses' } },
-                        { data: { source: 'agent-content', target: 'tool-nlp', type: 'uses' } },
-                        { data: { source: 'agent-insights', target: 'tool-analytics', type: 'uses' } },
-                        { data: { source: 'agent-insights', target: 'tool-prediction', type: 'uses' } },
-                        { data: { source: 'agent-risk', target: 'tool-prediction', type: 'uses' } },
-                        { data: { source: 'agent-risk', target: 'tool-db', type: 'uses' } },
-                        { data: { source: 'agent-optimization', target: 'tool-ab', type: 'uses' } },
-                        { data: { source: 'agent-optimization', target: 'tool-analytics', type: 'uses' } },
+                        // Real-time connections
+                        { data: { source: 'dashboard', target: 'realtime', label: 'WebSocket' } },
+                        { data: { source: 'campaigns', target: 'realtime', label: 'WebSocket' } },
+                        { data: { source: 'analytics', target: 'realtime', label: 'WebSocket' } },
                         
-                        // Inter-agent connections
-                        { data: { source: 'agent-scenario', target: 'agent-content', type: 'requests' } },
-                        { data: { source: 'agent-insights', target: 'agent-optimization', type: 'informs' } },
-                        { data: { source: 'agent-risk', target: 'agent-segment', type: 'informs' } }
+                        // API to services
+                        { data: { source: 'api', target: 'auth', label: 'Verify' } },
+                        { data: { source: 'api', target: 'langgraph', label: 'AI Tasks' } },
+                        { data: { source: 'api', target: 'supabase', label: 'CRUD' } },
+                        { data: { source: 'api', target: 'redis', label: 'Cache' } },
+                        
+                        // Service interconnections
+                        { data: { source: 'langgraph', target: 'supabase', label: 'Query' } },
+                        { data: { source: 'realtime', target: 'convex-db', label: 'Sync' } },
+                        { data: { source: 'convex-db', target: 'supabase', label: 'Replicate' } },
+                        
+                        // External integrations
+                        { data: { source: 'api', target: 'casino-apis', label: 'Fetch' } },
+                        { data: { source: 'api', target: 'payment', label: 'Process' } },
+                        { data: { source: 'langgraph', target: 'comm-apis', label: 'Send' } }
                     ],
                     style: [
                         {
@@ -2643,107 +2638,70 @@
                                 'text-max-width': 140
                             }
                         },
+                        // Core services
                         {
-                            selector: 'node[type="agent"]',
+                            selector: 'node[type="service"]',
                             style: {
-                                'background-color': '#f093fb',
-                                'label': 'data(label)',
-                                'color': '#000',
-                                'text-valign': 'center',
-                                'text-halign': 'center',
-                                'width': 'label',
-                                'height': 'label',
-                                'padding': 20,
-                                'font-size': 12,
+                                'shape': 'diamond',
+                                'background-color': '#9b59b6',
+                                'width': 100,
+                                'height': 100,
                                 'border-width': 2,
-                                'border-color': '#764ba2',
-                                'shape': 'ellipse',
-                                'text-wrap': 'wrap',
-                                'text-max-width': 100
-                            }
-                        },
-                        {
-                            selector: 'node[type="tool"]',
-                            style: {
-                                'background-color': '#4facfe',
+                                'border-color': '#8e44ad',
                                 'label': 'data(label)',
                                 'color': '#fff',
                                 'text-valign': 'center',
-                                'text-halign': 'center',
-                                'width': 'label',
-                                'height': 'label',
-                                'padding': 15,
-                                'font-size': 11,
-                                'border-width': 1,
-                                'border-color': '#2980b9',
-                                'shape': 'diamond',
-                                'text-wrap': 'wrap',
-                                'text-max-width': 80
+                                'text-halign': 'center'
                             }
                         },
+                        // Databases
                         {
-                            selector: 'edge[type="provides"]',
+                            selector: 'node[type="database"]',
                             style: {
-                                'width': 3,
-                                'line-color': '#667eea',
-                                'target-arrow-color': '#667eea',
-                                'target-arrow-shape': 'triangle',
-                                'curve-style': 'bezier',
-                                'line-style': 'solid'
+                                'shape': 'barrel',
+                                'background-color': '#16a085',
+                                'width': 100,
+                                'height': 80,
+                                'border-width': 2,
+                                'border-color': '#1abc9c',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center'
                             }
                         },
+                        // External services
                         {
-                            selector: 'edge[type="orchestrates"]',
+                            selector: 'node[type="external"]',
                             style: {
-                                'width': 4,
-                                'line-color': '#764ba2',
-                                'target-arrow-color': '#764ba2',
-                                'target-arrow-shape': 'triangle',
-                                'curve-style': 'bezier',
-                                'line-style': 'solid'
+                                'shape': 'round-rectangle',
+                                'background-color': '#95a5a6',
+                                'width': 110,
+                                'height': 70,
+                                'border-width': 2,
+                                'border-color': '#7f8c8d',
+                                'border-style': 'dashed',
+                                'label': 'data(label)',
+                                'color': '#fff',
+                                'text-valign': 'center',
+                                'text-halign': 'center'
                             }
                         },
+                        // Edges
                         {
-                            selector: 'edge[type="uses"]',
-                            style: {
-                                'width': 2,
-                                'line-color': '#4facfe',
-                                'target-arrow-color': '#4facfe',
-                                'target-arrow-shape': 'triangle',
-                                'curve-style': 'bezier',
-                                'line-style': 'dashed'
-                            }
-                        },
-                        {
-                            selector: 'edge[type="requests"]',
+                            selector: 'edge',
                             style: {
                                 'width': 2,
-                                'line-color': '#f093fb',
-                                'target-arrow-color': '#f093fb',
+                                'line-color': '#7f8c8d',
+                                'target-arrow-color': '#7f8c8d',
                                 'target-arrow-shape': 'triangle',
                                 'curve-style': 'bezier',
-                                'line-style': 'dotted'
-                            }
-                        },
-                        {
-                            selector: 'edge[type="data"]',
-                            style: {
-                                'width': 2,
-                                'line-color': '#42e695',
-                                'target-arrow-color': '#42e695',
-                                'target-arrow-shape': 'triangle',
-                                'curve-style': 'bezier'
-                            }
-                        },
-                        {
-                            selector: 'edge[type="informs"]',
-                            style: {
-                                'width': 2,
-                                'line-color': '#ffc864',
-                                'target-arrow-color': '#ffc864',
-                                'target-arrow-shape': 'triangle',
-                                'curve-style': 'bezier',
-                                'line-style': 'dotted'
+                                'label': 'data(label)',
+                                'font-size': '9px',
+                                'text-background-color': '#1a1a1a',
+                                'text-background-opacity': 0.8,
+                                'text-background-padding': '2px',
+                                'color': '#ecf0f1'
                             }
                         }
                     ],
@@ -3008,242 +2966,356 @@
                 }, 100);
             }
 
-            // Database Schema Graph
+            // Database Schema Graph - PostgreSQL style
             const databaseContainer = document.getElementById('databaseGraph');
             if (databaseContainer) {
+                databaseContainer.style.minHeight = '600px';
+                
                 graphs.database = cytoscape({
                     container: databaseContainer,
                     elements: [
-                        // Tables
-                        { data: { id: 'users', label: 'USERS\n\nuserId (PK)\nname\navatarUrl\ndemographics\nfinancial_summary\npredictive_scores' } },
-                        { data: { id: 'events', label: 'EVENTS\n\neventId (PK)\nuserId (FK)\ntype\ndetails\ntimestamp' } },
-                        { data: { id: 'segments', label: 'SEGMENTS\n\nsegmentId (PK)\nname\ndescription\nrules\nis_dynamic' } },
-                        { data: { id: 'campaigns', label: 'CAMPAIGNS\n\ncampaignId (PK)\nname\ndescription' } },
-                        { data: { id: 'scenarios', label: 'SCENARIOS\n\nscenarioId (PK)\ncampaignId (FK)\nname\ntrigger_type\nnodes\nedges' } },
-                        { data: { id: 'logs', label: 'COMMUNICATION_LOGS\n\nlogId (PK)\nuserId (FK)\nscenarioId (FK)\nchannel\nstatus' } },
+                        // Core Tables
+                        { data: { id: 'players', label: 'players\n\nid: uuid PK\ncasino_id: text\nemail: text\nphone: text\nfirst_name: text\nlast_name: text\nregistered_at: timestamp\nlast_active: timestamp\nlifetime_value: numeric\nrisk_score: float\npreferred_games: jsonb\nmetadata: jsonb', type: 'table' } },
+                        
+                        { data: { id: 'player_events', label: 'player_events\n\nid: uuid PK\nplayer_id: uuid FK\nevent_type: text\nevent_data: jsonb\namount: numeric\ngame_id: text\nsession_id: text\ncreated_at: timestamp', type: 'table' } },
+                        
+                        { data: { id: 'segments', label: 'segments\n\nid: uuid PK\nname: text\ndescription: text\ntype: enum\nfilters: jsonb\nis_dynamic: boolean\nplayer_count: integer\ncreated_by: uuid\ncreated_at: timestamp', type: 'table' } },
+                        
+                        { data: { id: 'player_segments', label: 'player_segments\n\nplayer_id: uuid FK\nsegment_id: uuid FK\nadded_at: timestamp\nremoved_at: timestamp\nscore: float', type: 'junction' } },
+                        
+                        { data: { id: 'campaigns', label: 'campaigns\n\nid: uuid PK\nname: text\nstatus: enum\ntype: text\nstart_date: timestamp\nend_date: timestamp\nbudget: numeric\nroi_target: float\nmetadata: jsonb', type: 'table' } },
+                        
+                        { data: { id: 'scenarios', label: 'scenarios\n\nid: uuid PK\ncampaign_id: uuid FK\nname: text\ntrigger_type: enum\nflow_graph: jsonb\nbonus_rules: jsonb\nis_active: boolean\nversion: integer', type: 'table' } },
+                        
+                        { data: { id: 'bonuses', label: 'bonuses\n\nid: uuid PK\nplayer_id: uuid FK\nscenario_id: uuid FK\ntype: enum\namount: numeric\nwager_requirement: float\nexpires_at: timestamp\nactivated_at: timestamp\nstatus: enum', type: 'table' } },
+                        
+                        { data: { id: 'communications', label: 'communications\n\nid: uuid PK\nplayer_id: uuid FK\nscenario_id: uuid FK\nchannel: enum\ntemplate_id: text\ncontent: jsonb\nstatus: enum\nsent_at: timestamp\nopened_at: timestamp\nclicked_at: timestamp', type: 'table' } },
+                        
+                        { data: { id: 'analytics', label: 'analytics_metrics\n\nid: uuid PK\nmetric_type: text\nperiod: tsrange\nsegment_id: uuid FK\nvalue: numeric\ndetails: jsonb\ncalculated_at: timestamp', type: 'table' } },
                         
                         // Relations
-                        { data: { source: 'events', target: 'users', label: 'has' } },
-                        { data: { source: 'users', target: 'segments', label: 'belongs to' } },
-                        { data: { source: 'scenarios', target: 'campaigns', label: 'part of' } },
-                        { data: { source: 'logs', target: 'users', label: 'sent to' } },
-                        { data: { source: 'logs', target: 'scenarios', label: 'sent from' } }
+                        { data: { source: 'player_events', target: 'players', label: 'REFERENCES' } },
+                        { data: { source: 'player_segments', target: 'players', label: 'REFERENCES' } },
+                        { data: { source: 'player_segments', target: 'segments', label: 'REFERENCES' } },
+                        { data: { source: 'scenarios', target: 'campaigns', label: 'BELONGS TO' } },
+                        { data: { source: 'bonuses', target: 'players', label: 'ISSUED TO' } },
+                        { data: { source: 'bonuses', target: 'scenarios', label: 'FROM' } },
+                        { data: { source: 'communications', target: 'players', label: 'SENT TO' } },
+                        { data: { source: 'communications', target: 'scenarios', label: 'TRIGGERED BY' } },
+                        { data: { source: 'analytics', target: 'segments', label: 'TRACKS' } }
                     ],
                     style: [
+                        // Base node style
                         {
                             selector: 'node',
                             style: {
-                                'background-color': '#667eea',
                                 'label': 'data(label)',
-                                'color': '#fff',
-                                'text-valign': 'center',
+                                'text-valign': 'top',
                                 'text-halign': 'center',
+                                'text-margin-y': 10,
+                                'text-wrap': 'wrap',
+                                'text-max-width': 200,
+                                'font-size': 10,
+                                'font-family': 'monospace',
+                                'line-height': 1.4,
+                                'color': '#fff',
                                 'width': 'label',
                                 'height': 'label',
-                                'padding': 25,
-                                'shape': 'rectangle',
-                                'text-wrap': 'wrap',
-                                'text-max-width': 180,
-                                'font-size': 11,
-                                'border-width': 2,
-                                'border-color': '#764ba2',
-                                'line-height': 1.3
+                                'padding': 20
                             }
                         },
+                        // Main tables
+                        {
+                            selector: 'node[type="table"]',
+                            style: {
+                                'shape': 'round-rectangle',
+                                'background-color': '#2c3e50',
+                                'border-width': 3,
+                                'border-color': '#34495e'
+                            }
+                        },
+                        // Junction tables
+                        {
+                            selector: 'node[type="junction"]',
+                            style: {
+                                'shape': 'cut-rectangle',
+                                'background-color': '#8e44ad',
+                                'border-width': 2,
+                                'border-color': '#9b59b6',
+                                'border-style': 'dashed'
+                            }
+                        },
+                        // Foreign key relationships
                         {
                             selector: 'edge',
                             style: {
                                 'width': 2,
-                                'line-color': '#764ba2',
-                                'target-arrow-color': '#764ba2',
+                                'line-color': '#7f8c8d',
+                                'target-arrow-color': '#7f8c8d',
                                 'target-arrow-shape': 'triangle',
+                                'source-arrow-shape': 'circle',
+                                'source-arrow-color': '#7f8c8d',
                                 'curve-style': 'bezier',
                                 'label': 'data(label)',
-                                'font-size': 10,
-                                'color': '#aaa'
+                                'font-size': 9,
+                                'text-background-color': '#1a1a1a',
+                                'text-background-opacity': 0.9,
+                                'text-background-padding': '2px',
+                                'color': '#ecf0f1'
                             }
                         }
                     ],
                     layout: {
                         name: 'cose',
-                        nodeRepulsion: 8000,
-                        idealEdgeLength: 100,
-                        edgeElasticity: 100,
+                        nodeRepulsion: 10000,
+                        idealEdgeLength: 150,
+                        edgeElasticity: 200,
                         nestingFactor: 5,
                         gravity: 80,
                         numIter: 1000,
-                        initialTemp: 200,
+                        initialTemp: 300,
                         coolingFactor: 0.95,
-                        minTemp: 1.0
+                        minTemp: 1.0,
+                        componentSpacing: 100
                     }
                 });
+                
+                // Автоматически подгоняем по размеру
+                setTimeout(() => {
+                    if (graphs.database) {
+                        graphs.database.fit();
+                        graphs.database.center();
+                    }
+                }, 100);
             }
 
-            // AI Agents Graph
+            // AI Agents Graph - LangGraph Architecture
             const aiAgentsContainer = document.getElementById('aiAgentsGraph');
             if (aiAgentsContainer) {
+                aiAgentsContainer.style.minHeight = '600px';
+                
                 graphs.aiAgents = cytoscape({
                     container: aiAgentsContainer,
                     elements: [
-                        // Interface layer
-                        { data: { id: 'copilot', label: 'AI Co-pilot\nChat UI', layer: 'interface' } },
-                        { data: { id: 'dashboard', label: 'Dashboards\n& Builders', layer: 'interface' } },
+                        // User Interface
+                        { data: { id: 'chat', label: 'Chat Interface', type: 'interface' } },
+                        { data: { id: 'dashboard', label: 'Dashboard', type: 'interface' } },
                         
-                        // Orchestrator
-                        { data: { id: 'orchestrator', label: 'LangGraph\nOrchestrator', layer: 'orchestrator' } },
+                        // LangGraph Core
+                        { data: { id: 'supervisor', label: 'Supervisor\nAgent', type: 'supervisor' } },
+                        { data: { id: 'state', label: 'Graph State\nManager', type: 'state' } },
                         
-                        // Agents
-                        { data: { id: 'agent1', label: 'Segment Agent\nАнализ и\nСегментация', layer: 'agent' } },
-                        { data: { id: 'agent2', label: 'Scenario Agent\nГенерация\nСценариев', layer: 'agent' } },
-                        { data: { id: 'agent3', label: 'Content Agent\nГенерация\nКонтента', layer: 'agent' } },
-                        { data: { id: 'agent4', label: 'Insights Agent\nИнсайты и\nПрогнозы', layer: 'agent' } },
-                        { data: { id: 'agent5', label: 'Risk Agent\nОценка\nРисков', layer: 'agent' } },
-                        { data: { id: 'agent6', label: 'Optimization\nAgent', layer: 'agent' } },
+                        // Specialized Agents
+                        { data: { id: 'analyzer', label: 'Player Analyzer\nAgent', type: 'agent' } },
+                        { data: { id: 'segmenter', label: 'Segmentation\nAgent', type: 'agent' } },
+                        { data: { id: 'scenario', label: 'Scenario Builder\nAgent', type: 'agent' } },
+                        { data: { id: 'bonus', label: 'Bonus Calculator\nAgent', type: 'agent' } },
+                        { data: { id: 'content', label: 'Content Generator\nAgent', type: 'agent' } },
+                        { data: { id: 'executor', label: 'Campaign Executor\nAgent', type: 'agent' } },
                         
-                        // Data sources
-                        { data: { id: 'db', label: 'База\nДанных', layer: 'data' } },
-                        { data: { id: 'twilio', label: 'Twilio\nAPI', layer: 'data' } },
-                        { data: { id: 'sendgrid', label: 'SendGrid\nAPI', layer: 'data' } },
-                        { data: { id: 'customerio', label: 'Customer.io\nAPI', layer: 'data' } },
+                        // Tools & Functions
+                        { data: { id: 'query_tool', label: 'SQL Query\nTool', type: 'tool' } },
+                        { data: { id: 'ml_tool', label: 'ML Prediction\nTool', type: 'tool' } },
+                        { data: { id: 'template_tool', label: 'Template\nEngine', type: 'tool' } },
+                        { data: { id: 'api_tool', label: 'External API\nTool', type: 'tool' } },
                         
-                        // Connections
-                        { data: { source: 'copilot', target: 'orchestrator' } },
-                        { data: { source: 'dashboard', target: 'orchestrator' } },
-                        { data: { source: 'orchestrator', target: 'agent1' } },
-                        { data: { source: 'orchestrator', target: 'agent2' } },
-                        { data: { source: 'orchestrator', target: 'agent3' } },
-                        { data: { source: 'orchestrator', target: 'agent4' } },
-                        { data: { source: 'orchestrator', target: 'agent5' } },
-                        { data: { source: 'orchestrator', target: 'agent6' } },
-                        { data: { source: 'agent1', target: 'db' } },
-                        { data: { source: 'agent2', target: 'db' } },
-                        { data: { source: 'agent2', target: 'agent3' } },
-                        { data: { source: 'agent4', target: 'db' } },
-                        { data: { source: 'agent5', target: 'db' } },
-                        { data: { source: 'agent6', target: 'db' } },
-                        { data: { source: 'agent2', target: 'twilio' } },
-                        { data: { source: 'agent2', target: 'sendgrid' } },
-                        { data: { source: 'agent2', target: 'customerio' } },
-                        { data: { source: 'agent3', target: 'customerio' } }
+                        // Data Layer
+                        { data: { id: 'supabase', label: 'Supabase', type: 'database' } },
+                        { data: { id: 'vector_db', label: 'Vector DB\n(Embeddings)', type: 'database' } },
+                        { data: { id: 'comm_api', label: 'Communication\nAPIs', type: 'external' } },
+                        
+                        // Flow connections
+                        // UI to Supervisor
+                        { data: { source: 'chat', target: 'supervisor', label: 'Request' } },
+                        { data: { source: 'dashboard', target: 'supervisor', label: 'Command' } },
+                        
+                        // Supervisor orchestration
+                        { data: { source: 'supervisor', target: 'state', label: 'Updates' } },
+                        { data: { source: 'state', target: 'supervisor', label: 'Context' } },
+                        
+                        // Supervisor to Agents
+                        { data: { source: 'supervisor', target: 'analyzer', label: 'Analyze' } },
+                        { data: { source: 'supervisor', target: 'segmenter', label: 'Segment' } },
+                        { data: { source: 'supervisor', target: 'scenario', label: 'Build' } },
+                        { data: { source: 'supervisor', target: 'bonus', label: 'Calculate' } },
+                        { data: { source: 'supervisor', target: 'content', label: 'Generate' } },
+                        { data: { source: 'supervisor', target: 'executor', label: 'Execute' } },
+                        
+                        // Agent to Tools
+                        { data: { source: 'analyzer', target: 'query_tool' } },
+                        { data: { source: 'analyzer', target: 'ml_tool' } },
+                        { data: { source: 'segmenter', target: 'query_tool' } },
+                        { data: { source: 'bonus', target: 'ml_tool' } },
+                        { data: { source: 'content', target: 'template_tool' } },
+                        { data: { source: 'executor', target: 'api_tool' } },
+                        
+                        // Tools to Data
+                        { data: { source: 'query_tool', target: 'supabase' } },
+                        { data: { source: 'ml_tool', target: 'vector_db' } },
+                        { data: { source: 'template_tool', target: 'vector_db' } },
+                        { data: { source: 'api_tool', target: 'comm_api' } },
+                        
+                        // Agent collaboration
+                        { data: { source: 'analyzer', target: 'segmenter', label: 'Data' } },
+                        { data: { source: 'segmenter', target: 'scenario', label: 'Segments' } },
+                        { data: { source: 'scenario', target: 'bonus', label: 'Rules' } },
+                        { data: { source: 'bonus', target: 'content', label: 'Offers' } },
+                        { data: { source: 'content', target: 'executor', label: 'Messages' } }
                     ],
                     style: [
+                        // Base style for all nodes
                         {
                             selector: 'node',
                             style: {
+                                'label': 'data(label)',
                                 'text-valign': 'center',
                                 'text-halign': 'center',
                                 'text-wrap': 'wrap',
                                 'text-max-width': '80px',
-                                'font-size': '12px',
-                                'min-width': '120px',
-                                'min-height': '80px',
-                                'width': 'label',
-                                'height': 'label',
-                                'padding': '20px'
+                                'font-size': '11px',
+                                'color': '#fff',
+                                'width': 100,
+                                'height': 80
                             }
                         },
+                        // Interface nodes
                         {
-                            selector: 'node[layer="interface"]',
+                            selector: 'node[type="interface"]',
                             style: {
-                                'background-color': '#f093fb',
-                                'label': 'data(label)',
-                                'color': '#fff',
                                 'shape': 'round-rectangle',
+                                'background-color': '#3498db',
                                 'border-width': 2,
-                                'border-color': '#d946ef'
+                                'border-color': '#2980b9'
                             }
                         },
+                        // Supervisor (LangGraph core)
                         {
-                            selector: 'node[layer="orchestrator"]',
+                            selector: 'node[type="supervisor"]',
                             style: {
-                                'background-color': '#764ba2',
-                                'label': 'data(label)',
-                                'color': '#fff',
-                                'font-size': '14px',
-                                'font-weight': 'bold',
                                 'shape': 'hexagon',
+                                'background-color': '#e74c3c',
+                                'width': 120,
+                                'height': 100,
+                                'font-weight': 'bold',
+                                'font-size': '13px',
                                 'border-width': 3,
-                                'border-color': '#f093fb',
-                                'min-width': '160px',
-                                'min-height': '100px'
+                                'border-color': '#c0392b'
                             }
                         },
+                        // State Manager
                         {
-                            selector: 'node[layer="agent"]',
+                            selector: 'node[type="state"]',
                             style: {
-                                'background-color': '#667eea',
-                                'label': 'data(label)',
-                                'color': '#fff',
-                                'shape': 'ellipse',
+                                'shape': 'round-diamond',
+                                'background-color': '#9b59b6',
+                                'width': 100,
+                                'height': 100,
+                                'border-width': 3,
+                                'border-color': '#8e44ad'
+                            }
+                        },
+                        // AI Agents
+                        {
+                            selector: 'node[type="agent"]',
+                            style: {
+                                'shape': 'round-octagon',
+                                'background-color': '#f39c12',
                                 'border-width': 2,
-                                'border-color': '#4c1d95'
+                                'border-color': '#e67e22'
                             }
                         },
+                        // Tools
                         {
-                            selector: 'node[layer="data"]',
+                            selector: 'node[type="tool"]',
                             style: {
-                                'background-color': '#4facfe',
-                                'label': 'data(label)',
-                                'color': '#fff',
+                                'shape': 'cut-rectangle',
+                                'background-color': '#27ae60',
+                                'width': 90,
+                                'height': 70,
+                                'font-size': '10px',
+                                'border-width': 2,
+                                'border-color': '#229954'
+                            }
+                        },
+                        // Databases
+                        {
+                            selector: 'node[type="database"]',
+                            style: {
                                 'shape': 'barrel',
+                                'background-color': '#16a085',
                                 'border-width': 2,
-                                'border-color': '#0ea5e9'
+                                'border-color': '#1abc9c'
                             }
                         },
+                        // External APIs
+                        {
+                            selector: 'node[type="external"]',
+                            style: {
+                                'shape': 'round-rectangle',
+                                'background-color': '#95a5a6',
+                                'border-width': 2,
+                                'border-color': '#7f8c8d',
+                                'border-style': 'dashed'
+                            }
+                        },
+                        // Edges
                         {
                             selector: 'edge',
                             style: {
                                 'width': 2,
-                                'line-color': '#64748b',
-                                'target-arrow-color': '#64748b',
+                                'line-color': '#7f8c8d',
+                                'target-arrow-color': '#7f8c8d',
                                 'target-arrow-shape': 'triangle',
                                 'curve-style': 'bezier',
-                                'control-point-step-size': 40
+                                'label': 'data(label)',
+                                'font-size': '9px',
+                                'text-background-color': '#1a1a1a',
+                                'text-background-opacity': 0.8,
+                                'text-background-padding': '2px',
+                                'color': '#ecf0f1'
                             }
                         }
                     ],
                     layout: {
-                        name: 'cose',
-                        animate: false,
-                        nodeRepulsion: 400000,
-                        nodeOverlap: 100,
-                        idealEdgeLength: 200,
-                        edgeElasticity: 100,
-                        nestingFactor: 5,
-                        gravity: 25,
-                        numIter: 2000,
-                        initialTemp: 200,
-                        coolingFactor: 0.95,
-                        minTemp: 1.0,
+                        name: 'preset',
+                        positions: {
+                            // Top layer - Interface
+                            'chat': { x: 300, y: 50 },
+                            'dashboard': { x: 500, y: 50 },
+                            
+                            // Core layer - LangGraph
+                            'supervisor': { x: 400, y: 200 },
+                            'state': { x: 600, y: 200 },
+                            
+                            // Agent layer
+                            'analyzer': { x: 100, y: 350 },
+                            'segmenter': { x: 250, y: 350 },
+                            'scenario': { x: 400, y: 350 },
+                            'bonus': { x: 550, y: 350 },
+                            'content': { x: 700, y: 350 },
+                            'executor': { x: 850, y: 350 },
+                            
+                            // Tool layer
+                            'query_tool': { x: 200, y: 500 },
+                            'ml_tool': { x: 400, y: 500 },
+                            'template_tool': { x: 600, y: 500 },
+                            'api_tool': { x: 800, y: 500 },
+                            
+                            // Data layer
+                            'supabase': { x: 200, y: 650 },
+                            'vector_db': { x: 400, y: 650 },
+                            'comm_api': { x: 700, y: 650 }
+                        },
+                        fit: true,
                         padding: 50
                     }
                 });
-
-                // После инициализации применяем кастомную компоновку
+                
+                // Автоматически подгоняем по размеру
                 setTimeout(() => {
                     if (graphs.aiAgents) {
-                        // Интерфейсный слой - сверху
-                        graphs.aiAgents.$('#copilot').position({ x: 200, y: 50 });
-                        graphs.aiAgents.$('#dashboard').position({ x: 400, y: 50 });
-                        
-                        // Оркестратор - в центре
-                        graphs.aiAgents.$('#orchestrator').position({ x: 300, y: 200 });
-                        
-                        // Агенты - полукругом вокруг оркестратора
-                        graphs.aiAgents.$('#agent1').position({ x: 100, y: 350 });
-                        graphs.aiAgents.$('#agent2').position({ x: 250, y: 380 });
-                        graphs.aiAgents.$('#agent3').position({ x: 400, y: 380 });
-                        graphs.aiAgents.$('#agent4').position({ x: 550, y: 350 });
-                        graphs.aiAgents.$('#agent5').position({ x: 150, y: 450 });
-                        graphs.aiAgents.$('#agent6').position({ x: 450, y: 450 });
-                        
-                        // Источники данных - внизу
-                        graphs.aiAgents.$('#db').position({ x: 300, y: 550 });
-                        graphs.aiAgents.$('#twilio').position({ x: 100, y: 550 });
-                        graphs.aiAgents.$('#sendgrid').position({ x: 200, y: 550 });
-                        graphs.aiAgents.$('#customerio').position({ x: 400, y: 550 });
-                        
                         graphs.aiAgents.fit();
+                        graphs.aiAgents.center();
                     }
                 }, 100);
             }
