@@ -3077,10 +3077,15 @@
                 }, 100);
             }
 
-            // Use Case 1 Graph
-            const useCase1Container = document.getElementById('useCase1Graph');
-            if (useCase1Container) {
-                graphs.useCase1 = cytoscape({
+            // Use Case 1 Graph - с задержкой для полной загрузки DOM
+            setTimeout(() => {
+                const useCase1Container = document.getElementById('useCase1Graph');
+                if (useCase1Container) {
+                    // Убедимся, что контейнер имеет высоту
+                    if (useCase1Container.offsetHeight === 0) {
+                        useCase1Container.style.height = '400px';
+                    }
+                    graphs.useCase1 = cytoscape({
                     container: useCase1Container,
                     elements: [
                         // Steps
@@ -3151,13 +3156,19 @@
                         nodeSep: 50,
                         rankSep: 80
                     }
-                });
-            }
+                    });
+                }
+            }, 500);
 
-            // Use Case 2 Graph
-            const useCase2Container = document.getElementById('useCase2Graph');
-            if (useCase2Container) {
-                graphs.useCase2 = cytoscape({
+            // Use Case 2 Graph - с задержкой для полной загрузки DOM
+            setTimeout(() => {
+                const useCase2Container = document.getElementById('useCase2Graph');
+                if (useCase2Container) {
+                    // Убедимся, что контейнер имеет высоту
+                    if (useCase2Container.offsetHeight === 0) {
+                        useCase2Container.style.height = '400px';
+                    }
+                    graphs.useCase2 = cytoscape({
                     container: useCase2Container,
                     elements: [
                         // Steps
@@ -3228,8 +3239,9 @@
                         nodeSep: 50,
                         rankSep: 80
                     }
-                });
-            }
+                    });
+                }
+            }, 500);
         }
 
         // Graph control functions
